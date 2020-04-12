@@ -1,0 +1,25 @@
+version: "3.3"
+services:
+  api:
+    container_name: "api-kuclap"
+    build: "./api"
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./api:/go/src/app"
+    depends_on:
+      - "mongo"
+  mongo:
+    container_name: "mongo-kuclap"
+    image: "mongo:latest"
+    ports:
+      - "27100:27017"
+  # web:
+  #   container_name: "web-kuclap"
+  #   image: "nginx:latest"
+  #   ports:
+  #     - "8081:80"
+  #   volumes:
+  #     - "./web:/usr/share/nginx/html"
+  #   depends_on:
+  #     - "api"
