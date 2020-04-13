@@ -17,7 +17,7 @@ type UsersDAO struct {
 var db *mgo.Database
 
 const (
-	COLLECTION = "users"
+	COLLECTION = "reviews"
 )
 
 // Establish a connection to database
