@@ -15,7 +15,7 @@ import (
 
 var reviews *mgo.Collection
 
-func ConnectDB(){
+func Connect(){
 	// Connect to mongo
 	session, err := mgo.Dial("mongo:27017")
 	if err != nil {

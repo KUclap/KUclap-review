@@ -17,10 +17,10 @@ import (
 )
 
 // var reviews *mgo.Collection
-func init() {
-	controllers.ConnectDB()
-}
 
+func init() {
+	controllers.Connect()
+}
 
 func main(){
 	// Connect to mongo
@@ -44,6 +44,7 @@ func main(){
 	log.Println("Listening on port 8080...")
 	
 }
+
 
 // func createReview(w http.ResponseWriter, r *http.Request) {
 // 	data, err := ioutil.ReadAll(r.Body)
