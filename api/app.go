@@ -17,7 +17,7 @@ import (
 )
 
 var config = Config{}
-var dao = UsersDAO{}
+var dao = dao.UsersDAO{}
 
 // GET list of users
 func AllUsersEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +43,7 @@ func FindUserEndpoint(w http.ResponseWriter, r *http.Request) {
 // POST a new user
 func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var user User
+	var user models.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
@@ -60,7 +60,7 @@ func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 func UpdateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
-	var user User
+	var user models.User
 	user.ID = bson.ObjectIdHex(params["id"])
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
@@ -76,7 +76,7 @@ func UpdateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 // DELETE an existing user
 func DeleteUserEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var user User
+	var user models.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
