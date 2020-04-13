@@ -12,16 +12,16 @@ import (
 	"github.com/marsDev31/kuclap-backend/api/dao"
 	"github.com/marsDev31/kuclap-backend/api/models"
 	// . "./config"
-	// . "./dao"
+	// . "./mdao"
 	// . "./models"
 )
 
-var config = Config{}
-var dao = dao.UsersDAO{}
+var mcf = config.Config{}
+var mdao = dao.UsersDAO{}
 
 // GET list of users
 func AllUsersEndPoint(w http.ResponseWriter, r *http.Request) {
-	users, err := dao.FindAll()
+	users, err := mdao.FindAll()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -32,7 +32,7 @@ func AllUsersEndPoint(w http.ResponseWriter, r *http.Request) {
 // GET a users by its ID
 func FindUserEndpoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	user, err := dao.FindById(params["id"])
+	user, err := mdao.FindById(params["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid user ID")
 		return
@@ -49,7 +49,7 @@ func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.ID = bson.NewObjectId()
-	if err := dao.Insert(user); err != nil {
+	if err := mdao.Insert(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -66,7 +66,7 @@ func UpdateUserEndPoint(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if err := dao.Update(user); err != nil {
+	if err := mdao.Update(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -81,7 +81,7 @@ func DeleteUserEndPoint(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if err := dao.Delete(user); err != nil {
+	if err := mdao.Delete(user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -101,11 +101,11 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
-	config.Read()
+	mcf.Read()
 
-	dao.Server = config.Server
-	dao.Database = config.Database
-	dao.Connect()
+	mdao.Server = mcf.Server
+	mdao.Database = mcf.Database
+	mdao.Connect()
 }
 
 // Define HTTP request routes
