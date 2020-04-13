@@ -14,12 +14,3 @@ services:
     image: "mongo:latest"
     ports:
       - "27100:27017"
-  # web:
-  #   container_name: "web-kuclap"
-  #   image: "nginx:latest"
-  #   ports:
-  #     - "8081:80"
-  #   volumes:
-  #     - "./web:/usr/share/nginx/html"
-  #   depends_on:
-  #     - "api"

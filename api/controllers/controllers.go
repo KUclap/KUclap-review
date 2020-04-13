@@ -1,14 +1,15 @@
 package controllers
 import (
-
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"log"
+	"fmt"
 	"time"
 	"os"
-	"github.com/marsDev31/kuclap-backend/api/models"
+
 	"gopkg.in/mgo.v2"
+	"github.com/marsDev31/kuclap-backend/api/models"
 )
 
 var reviews *mgo.Collection
@@ -19,12 +20,14 @@ func ConnectDB() *mgo.Collection{
 	if err != nil {
 		log.Fatalln(err)
 		log.Fatalln("mongo err")
+		fmt.Println("mongo err")
 		os.Exit(1)
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	
-	reviews = session.DB("ku-clap").C("reviews")
+	reviews := session.DB("ku-clap").C("reviews")
+	fmt.Println("Conected DB")
 	return reviews
 }
 
