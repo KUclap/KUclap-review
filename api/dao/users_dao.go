@@ -3,9 +3,10 @@ package dao
 import (
 	"log"
 
-	"github.com/marsDev31/kuclap-backend/api/models"
-	mgo "gopkg.in/mgo.v2"
+
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/marsDev31/kuclap-backend/api/models"
 )
 
 type UsersDAO struct {
