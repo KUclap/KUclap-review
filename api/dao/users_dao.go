@@ -37,7 +37,7 @@ func (m *UsersDAO) FindAll() ([]models.User, error) {
 }
 
 // Find a user by its id
-func (m *UsersDAO) FindById(id string) (User, error) {
+func (m *UsersDAO) FindById(id string) (models.User, error) {
 	var user models.User
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&user)
 	return user, err
