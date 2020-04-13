@@ -17,6 +17,10 @@ import (
 )
 
 // var reviews *mgo.Collection
+func init() {
+	controllers.ConnectDB()
+}
+
 
 func main(){
 	// Connect to mongo
