@@ -29,34 +29,34 @@ func (m *ReviewsDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
-// Find list of users
+// Find list of reviews
 func (m *ReviewsDAO) FindAll() ([]models.Review, error) {
-	var users []models.Review
-	err := db.C(COLLECTION).Find(bson.M{}).All(&users)
-	return users, err
+	var reviews []models.Review
+	err := db.C(COLLECTION).Find(bson.M{}).All(&reviews)
+	return reviews, err
 }
 
-// Find a user by its id
+// Find a review by its id
 func (m *ReviewsDAO) FindById(id string) (models.Review, error) {
-	var user models.Review
-	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&user)
-	return user, err
+	var review models.Review
+	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&review)
+	return review, err
 }
 
-// Insert a user into database
-func (m *ReviewsDAO) Insert(user models.Review) error {
-	err := db.C(COLLECTION).Insert(&user)
+// Insert a review into database
+func (m *ReviewsDAO) Insert(review models.Review) error {
+	err := db.C(COLLECTION).Insert(&review)
 	return err
 }
 
-// Delete an existing user
-func (m *ReviewsDAO) Delete(user models.Review) error {
-	err := db.C(COLLECTION).Remove(&user)
+// Delete an existing review
+func (m *ReviewsDAO) Delete(review models.Review) error {
+	err := db.C(COLLECTION).Remove(&review)
 	return err
 }
 
-// Update an existing user
-func (m *ReviewsDAO) Update(user models.Review) error {
-	err := db.C(COLLECTION).UpdateId(user.ID, &user)
+// Update an existing review
+func (m *ReviewsDAO) Update(review models.Review) error {
+	err := db.C(COLLECTION).UpdateId(review.ID, &review)
 	return err
 }
