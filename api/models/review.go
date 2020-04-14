@@ -6,7 +6,7 @@ import (
 )
 
 type Review struct {
-	ID			bson.ObjectId	`json:"review_id" bson:"_id"`
+	ID			bson.ObjectId	`json:"reviewId" bson:"_id"`
 	Review		string			`json:"text" bson:"text"`
 	Author		string			`json:"author" bson:"author"`
 	Grade		string			`json:"grade" bson:"grade"`
