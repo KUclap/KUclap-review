@@ -124,7 +124,7 @@ func goDotEnvVariable(key string) string {
 func init() {
 	mcf.Read() // read config
 	// mdao.Server = mcf.Server
-	mdao.Server = os.Getenv("SERVER")
+	mdao.Server = goDotEnvVariable("SERVER")
 	mdao.Database = mcf.Database
 	mdao.Connect() // conecting database
 }
