@@ -25,25 +25,14 @@ const (
 func (m *ReviewsDAO) Connect() {
 
 	tlsConfig := &tls.Config{}
-	// dialInfo := &mgo.DialInfo{
-	// 	Addrs: []string{"prefix1.mongodb.net:27017", 
-	// 					"prefix2.mongodb.net:27017",
-	// 					"prefix3.mongodb.net:27017"},
-	// 	// Database: "authDatabaseName",
-	// 	Username: "user",
-	// 	Password: "pass",
-	// }
 	dialInfo, err := mgo.ParseURL(m.Server)
 	
 	dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
 		conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
 		return conn, err
 	}
-	
-
 	session, err := mgo.DialWithInfo(dialInfo)
-
-	// session, err := mgo.Dial(m.Server)
+	
 	if err != nil {
 		log.Fatal(err)
 	}
