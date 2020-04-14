@@ -2,8 +2,8 @@ package dao
 
 import (
 	"log"
-	_ "crypto/tls"
-    _ "net"
+	"crypto/tls"
+    "net"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -24,7 +24,7 @@ const (
 // Establish a connection to database
 func (m *ReviewsDAO) Connect() {
 
-	// tlsConfig := &tls.Config{}
+	tlsConfig := &tls.Config{}
 	// dialInfo := &mgo.DialInfo{
 	// 	Addrs: []string{"prefix1.mongodb.net:27017", 
 	// 					"prefix2.mongodb.net:27017",
@@ -33,14 +33,13 @@ func (m *ReviewsDAO) Connect() {
 	// 	Username: "user",
 	// 	Password: "pass",
 	// }
-	// dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
-	// 	conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
-	// 	return conn, err
-	// }
 	dialInfo, err := mgo.ParseURL(m.Server)
-	if err != nil {
-		log.Fatal(err)
+	
+	dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
+		conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
+		return conn, err
 	}
+	
 
 	session, err := mgo.DialWithInfo(dialInfo)
 
