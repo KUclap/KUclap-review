@@ -4,84 +4,85 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
+	"time"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/gorilla/mux"
 	"github.com/marsDev31/kuclap-backend/api/config"
 	"github.com/marsDev31/kuclap-backend/api/dao"
 	"github.com/marsDev31/kuclap-backend/api/models"
-	// . "./config"
-	// . "./mdao"
-	// . "./models"
 )
 
 var mcf = config.Config{}
-var mdao = dao.UsersDAO{}
+var mdao = dao.ReviewsDAO{}
 
-// GET list of users
-func AllUsersEndPoint(w http.ResponseWriter, r *http.Request) {
-	users, err := mdao.FindAll()
+// GET list of reviews
+func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
+	reviews, err := mdao.FindAll()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusOK, users)
+	respondWithJson(w, http.StatusOK, reviews)
 }
 
-// GET a users by its ID
-func FindUserEndpoint(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	user, err := mdao.FindById(params["id"])
+// GET a reviews by its ID
+func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r) //  param on endpoint
+	review, err := mdao.FindById(params["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid user ID")
+		respondWithError(w, http.StatusBadRequest, "Invalid review ID")
 		return
 	}
-	respondWithJson(w, http.StatusOK, user)
+	respondWithJson(w, http.StatusOK, review)
 }
 
-// POST a new user
-func CreateUserEndPoint(w http.ResponseWriter, r *http.Request) {
+// POST a new review
+func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var review models.Review
+	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	user.ID = bson.NewObjectId()
-	if err := mdao.Insert(user); err != nil {
+	review.CreatedAt = time.Now().UTC()
+	review.ID = bson.NewObjectId()
+	if err := mdao.Insert(review); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusCreated, user)
+	respondWithJson(w, http.StatusCreated, review)
 }
 
-// PUT update an existing user
-func UpdateUserEndPoint(w http.ResponseWriter, r *http.Request) {
+// PUT update an existing review
+func UpdateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
-	var user models.User
-	user.ID = bson.ObjectIdHex(params["id"])
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var review models.Review
+
+	review.UpdateAt = time.Now().UTC()
+	review.ID = bson.ObjectIdHex(params["id"])
+	
+	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if err := mdao.Update(user); err != nil {
+	if err := mdao.Update(review); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-// DELETE an existing user
-func DeleteUserEndPoint(w http.ResponseWriter, r *http.Request) {
+// DELETE an existing review
+func DeleteReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	var review models.Review
+	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if err := mdao.Delete(user); err != nil {
+	if err := mdao.Delete(review); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -101,21 +102,20 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
-	mcf.Read()
-
+	mcf.Read() // read config
 	mdao.Server = mcf.Server
 	mdao.Database = mcf.Database
-	mdao.Connect()
+	mdao.Connect() // conecting database
 }
 
 // Define HTTP request routes
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/users", AllUsersEndPoint).Methods("GET")
-	r.HandleFunc("/users", CreateUserEndPoint).Methods("POST")
-	r.HandleFunc("/users/{id}", UpdateUserEndPoint).Methods("PUT")
-	r.HandleFunc("/users", DeleteUserEndPoint).Methods("DELETE")
-	r.HandleFunc("/users/{id}", FindUserEndpoint).Methods("GET")
+	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
+	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
+	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews", DeleteReviewEndPoint).Methods("DELETE")
+	r.HandleFunc("/reviews/{id}", FindReviewEndpoint).Methods("GET")
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal(err)
 	}
