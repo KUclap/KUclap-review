@@ -7,7 +7,7 @@ import (
 
 type Review struct {
 	ID			bson.ObjectId	`json:"review_id" bson:"_id"`
-	Text		string			`json:"text" bson:"text"`
+	Review		string			`json:"text" bson:"text"`
 	Author		string			`json:"author" bson:"author"`
 	Grade		string			`json:"grade" bson:"grade"`
 	Auth		string			`json:"auth" bson:"auth"`
