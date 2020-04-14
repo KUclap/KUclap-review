@@ -48,7 +48,7 @@ func (m *ReviewsDAO) Connect() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db = session.DB(m.Database)
+	db = session
 
 }
 
