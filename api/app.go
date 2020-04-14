@@ -6,7 +6,9 @@ import (
 	"net/http"
 	"time"
 	"gopkg.in/mgo.v2/bson"
-
+	"fmt"
+	"os"
+	"github.com/joho/godotenv"
 	"github.com/gorilla/mux"
 	"github.com/marsDev31/kuclap-backend/api/config"
 	"github.com/marsDev31/kuclap-backend/api/dao"
@@ -15,6 +17,12 @@ import (
 
 var mcf = config.Config{}
 var mdao = dao.ReviewsDAO{}
+
+
+// ROOT request
+func Root(rw http.ResponseWriter, req *http.Request) {
+	fmt.Fprint(rw, "Hi Developers!, Welcome to KUclap services.If you have any problems,you can create PRs on the repository.")
+}
 
 // GET list of reviews
 func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +53,8 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	review.CreatedAt = time.Now().UTC()
+	review.CreatedAt = time.Now().UTC().Add(7 *time.Hour) // Parse UTC to GTM+7 Thailand's timezone.
+	review.UpdateAt = review.CreatedAt
 	review.ID = bson.NewObjectId()
 	if err := mdao.Insert(review); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -60,9 +69,9 @@ func UpdateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var review models.Review
 
-	review.UpdateAt = time.Now().UTC()
+	review.UpdateAt = time.Now().UTC().Add(7 *time.Hour)
 	review.ID = bson.ObjectIdHex(params["id"])
-	
+
 	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
@@ -100,23 +109,41 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
+//  Getter environment from .env.
+func goDotEnvVariable(key string) string {
+	// load .env file
+	err := godotenv.Load(".env")
+	if err != nil {
+	  log.Fatalf("Error loading .env file")
+	}
+	return os.Getenv(key)
+  }
+  
+
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
 	mcf.Read() // read config
-	mdao.Server = mcf.Server
+	// mdao.Server = mcf.Server
+	mdao.Server = os.Getenv("SERVER")
 	mdao.Database = mcf.Database
 	mdao.Connect() // conecting database
 }
 
 // Define HTTP request routes
 func main() {
+	port := goDotEnvVariable("PORT")
+	
 	r := mux.NewRouter()
+	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
 	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", DeleteReviewEndPoint).Methods("DELETE")
 	r.HandleFunc("/reviews/{id}", FindReviewEndpoint).Methods("GET")
-	if err := http.ListenAndServe(":3000", r); err != nil {
+
+	if err := http.ListenAndServe(":" + port, r); err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Listening on port " + port)
+	
 }

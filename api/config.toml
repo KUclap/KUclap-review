@@ -1,2 +1,2 @@
-server="mongo:27017"
+server="localhost"
 database="ku-clap"
