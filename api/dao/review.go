@@ -3,8 +3,8 @@ package dao
 import (
 	"log"
 	"crypto/tls"
-    "net"
-
+	"net"
+	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/marsDev31/kuclap-backend/api/models"
@@ -26,18 +26,19 @@ func (m *ReviewsDAO) Connect() {
 
 	tlsConfig := &tls.Config{}
 	dialInfo, err := mgo.ParseURL(m.Server)
-	
+	fmt.Println("CONNECTING: Parseurl finish.")
 	dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
 		conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
 		return conn, err
 	}
+	fmt.Println("CONNECTING: TLS configed.")
 	session, err := mgo.DialWithInfo(dialInfo)
 	
 	if err != nil {
 		log.Fatal(err)
 	}
 	db = session.DB(m.Database)
-
+	fmt.Println("CONNECTED: Got session.")
 }
 
 // Find list of reviews
