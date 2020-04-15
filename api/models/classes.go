@@ -1,6 +1,6 @@
 package models
 
-type Classes struct {
+type Class struct {
 	ClassId		string			`json:"classId"`
 	NameTh		string			`json:"nameTh"`
 	NameEn		string			`json:"nameEn"`
@@ -9,7 +9,7 @@ type Classes struct {
 }
 
 
-type OldClasses struct {
+type OldClass struct {
 	Value	string	`json:"value"`
 	Label	string	`json:"label"`
 }

@@ -20,7 +20,7 @@ import (
 
 var mcf = config.Config{}
 var mdao = dao.ReviewsDAO{}
-var classes []models.Classes
+var classes []models.Class
 
 // ROOT request
 func Root(w http.ResponseWriter, r *http.Request) {

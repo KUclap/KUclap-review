@@ -10,9 +10,9 @@ import (
 
 
 func main(){
-	var classesOld []models.OldClasses
+	var classesOld []models.OldClass
 	// var classesNew models.Classes
-	var result []models.Classes
+	var result []models.Class
 
 	// This I/O for reading from old data (KUnit version)
 	data, err := ioutil.ReadFile("../classes.json")
@@ -25,7 +25,7 @@ func main(){
 
 	// Make slice of Classes (KUclap version)
 	for _, class := range classesOld {
-		new := models.Classes{
+		new := models.Class{
 			class.Value,
 			strings.Fields(class.Label)[1],
 			strings.ReplaceAll(strings.Split(class.Label, "(")[1], ")", ""),
