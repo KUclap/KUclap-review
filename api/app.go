@@ -171,6 +171,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
+	r.HandleFunc("/last", LastReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
 	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
