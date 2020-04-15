@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"net"
 	"fmt"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/marsDev31/kuclap-backend/api/models"
@@ -31,7 +32,7 @@ func (m *ReviewsDAO) Connect() {
 		conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
 		return conn, err
 	}
-	fmt.Println("CONNECTING: TLS configed.")
+	fmt.Println("CONNECTING: TLS configed. 123")
 	session, err := mgo.DialWithInfo(dialInfo)
 	
 	if err != nil {

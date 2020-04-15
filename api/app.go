@@ -1,13 +1,15 @@
 package main
 
 import (
+	"io/ioutil"
 	"encoding/json"
 	"log"
 	"net/http"
 	"time"
-	"gopkg.in/mgo.v2/bson"
 	"fmt"
 	"os"
+
+	"gopkg.in/mgo.v2/bson"
 	"github.com/joho/godotenv"
 	"github.com/gorilla/mux"
 	"github.com/marsDev31/kuclap-backend/api/config"
@@ -15,14 +17,21 @@ import (
 	"github.com/marsDev31/kuclap-backend/api/models"
 )
 
+
 var mcf = config.Config{}
 var mdao = dao.ReviewsDAO{}
-
+var classes []models.Classes
 
 // ROOT request
-func Root(rw http.ResponseWriter, req *http.Request) {
-	fmt.Fprint(rw, "Hi Developers!, Welcome to KUclap services.If you have any problems,you can create PRs on the repository.")
+func Root(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services.If you have any problems,you can create PRs on the repository.")
 }
+
+// GET list of classes
+func AllClassesEndpoint(w http.ResponseWriter, r *http.Request) {
+	respondWithJson(w, http.StatusOK, classes)
+}
+
 
 // GET list of reviews
 func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -118,16 +127,26 @@ func goDotEnvVariable(key string) string {
 	}
 	return os.Getenv(key)
   }
-  
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
-	fmt.Println("start")
-	mcf.Read() // read config
-	// mdao.Server = mcf.Server
+	fmt.Println("Initial service..")
+	// Conection on database
+	mcf.Read()
 	mdao.Server = goDotEnvVariable("SERVER")
 	mdao.Database = mcf.Database
 	mdao.Connect() // conecting database
+	
+	// Read json file
+	data, err := ioutil.ReadFile("./classes.json")
+    if err != nil {
+      fmt.Print(err)
+	}
+	
+	err = json.Unmarshal(data, &classes)
+	if err != nil {
+        fmt.Println("error:", err)
+    }
 	
 }
 
@@ -138,6 +157,7 @@ func main() {
 	fmt.Println("Starting services.")
 	r := mux.NewRouter()
 	r.HandleFunc("/", Root).Methods("GET")
+	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
 	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
