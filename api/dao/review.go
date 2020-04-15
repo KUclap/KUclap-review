@@ -50,7 +50,7 @@ func (m *ReviewsDAO) LastReviews(offset string) ([]models.Review, error) {
 	if err != nil {
 		fmt.Println("err : atoi.", err)
 	}
-	err := db.C(COLLECTION).Find(bson.M{}).Sort({_id: -1}).Limit(iOffset).All(&reviews)
+	err = db.C(COLLECTION).Find(bson.M{}).Sort({_id: -1}).Limit(iOffset).All(&reviews)
 	return reviews, err
 }
 
