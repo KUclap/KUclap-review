@@ -122,15 +122,19 @@ func goDotEnvVariable(key string) string {
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
+	fmt.Println("start")
 	mcf.Read() // read config
 	// mdao.Server = mcf.Server
 	mdao.Server = goDotEnvVariable("SERVER")
 	mdao.Database = mcf.Database
+	fmt.Println("server %s", mdao.Server)
 	mdao.Connect() // conecting database
+	
 }
 
 // Define HTTP request routes
 func main() {
+	
 	port := goDotEnvVariable("PORT")
 	
 	r := mux.NewRouter()
@@ -145,5 +149,6 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("Listening on port " + port)
+	
 	
 }
