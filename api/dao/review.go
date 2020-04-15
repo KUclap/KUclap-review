@@ -38,7 +38,7 @@ func (m *ReviewsDAO) Connect() {
 		log.Fatal(err)
 	}
 	db = session.DB(m.Database)
-	fmt.Println("CONNECTED: Got session.")
+	fmt.Println("CONNECTED: got session.")
 }
 
 // Find list of reviews

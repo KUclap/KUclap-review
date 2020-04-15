@@ -127,7 +127,6 @@ func init() {
 	// mdao.Server = mcf.Server
 	mdao.Server = goDotEnvVariable("SERVER")
 	mdao.Database = mcf.Database
-	fmt.Println("server %s", mdao.Server)
 	mdao.Connect() // conecting database
 	
 }
@@ -136,7 +135,7 @@ func init() {
 func main() {
 	
 	port := goDotEnvVariable("PORT")
-	
+	fmt.Println("Starting services.")
 	r := mux.NewRouter()
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
