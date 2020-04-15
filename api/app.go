@@ -32,6 +32,16 @@ func AllClassesEndpoint(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, classes)
 }
 
+// GET list of reviews
+func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r) //  param on endpoint
+	reviews, err := mdao.LastReviews(params["offset"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid review offset")
+		return
+	}
+	respondWithJson(w, http.StatusOK, reviews)
+}
 
 // GET list of reviews
 func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {

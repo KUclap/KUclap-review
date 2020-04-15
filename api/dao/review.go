@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"net"
 	"fmt"
+	"strconv"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -40,6 +41,17 @@ func (m *ReviewsDAO) Connect() {
 	}
 	db = session.DB(m.Database)
 	fmt.Println("CONNECTED: got session.")
+}
+
+// Find list of reviews
+func (m *ReviewsDAO) LastReviews(offset string) ([]models.Review, error) {
+	var reviews []models.Review
+	iOffset, err := strconv.Atoi(offset)
+	if err != nil {
+		fmt.Println("err : atoi.", err)
+	}
+	err := db.C(COLLECTION).Find(bson.M{}).Sort({_id: -1}).Limit(iOffset).All(&reviews)
+	return reviews, err
 }
 
 // Find list of reviews
