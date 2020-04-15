@@ -24,7 +24,7 @@ var classes []models.Classes
 
 // ROOT request
 func Root(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services.If you have any problems,you can create PRs on the repository.")
+	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/marsDev31/kuclap-backend.")
 }
 
 // GET list of classes
@@ -131,14 +131,17 @@ func goDotEnvVariable(key string) string {
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
 	fmt.Println("Initial service..")
+
 	// Conection on database
 	mcf.Read()
 	mdao.Server = goDotEnvVariable("SERVER")
 	mdao.Database = mcf.Database
-	mdao.Connect() // conecting database
+	mdao.Connect() 
 	
 	// Read json file
-	data, err := ioutil.ReadFile("./classes.json")
+	// classed.json is old data (KUnit version)
+	// classedParsed.json is old data (KUclap version)
+	data, err := ioutil.ReadFile("./classesParsed.json")
     if err != nil {
       fmt.Print(err)
 	}

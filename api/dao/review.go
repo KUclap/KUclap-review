@@ -32,7 +32,7 @@ func (m *ReviewsDAO) Connect() {
 		conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
 		return conn, err
 	}
-	fmt.Println("CONNECTING: TLS configed. 123")
+	fmt.Println("CONNECTING: TLS configed.")
 	session, err := mgo.DialWithInfo(dialInfo)
 	
 	if err != nil {

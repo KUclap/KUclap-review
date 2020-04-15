@@ -1,0 +1,368 @@
+[
+	{
+		"classID": "01175111",
+		"nameTH": "กรีฑาลู่-ลาน",
+		"nameEN": "Track and Field for Health",
+		"label": "01175111 กรีฑาลู่-ลาน เพื่อสุขภาพ (Track and Field for Health)"
+	},
+	{
+		"classID": "01175112",
+		"nameTH": "แบดมินตันเพื่อสุขภาพ",
+		"nameEN": "Badminton for Health",
+		"label": "01175112 แบดมินตันเพื่อสุขภาพ (Badminton for Health)"
+	},
+	{
+		"classID": "01175113",
+		"nameTH": "เทนนิสเพื่อสุขภาพ",
+		"nameEN": "Tennis for Health",
+		"label": "01175113 เทนนิสเพื่อสุขภาพ (Tennis for Health)"
+	},
+	{
+		"classID": "01175114",
+		"nameTH": "เทเบิลเทนนิสเพื่อสุขภาพ",
+		"nameEN": "Table Tennis for Health",
+		"label": "01175114 เทเบิลเทนนิสเพื่อสุขภาพ (Table Tennis for Health)"
+	},
+	{
+		"classID": "01175115",
+		"nameTH": "ฝึกสมาธิด้วยกิจกรรมยิงปืน",
+		"nameEN": "Meditation with Shooting Activity",
+		"label": "01175115 ฝึกสมาธิด้วยกิจกรรมยิงปืน (Meditation with Shooting Activity)"
+	},
+	{
+		"classID": "01175117",
+		"nameTH": "ฝึกสมาธิด้วยกิจกรรมยิงธนู",
+		"nameEN": "Meditation with Archery Activity",
+		"label": "01175117 ฝึกสมาธิด้วยกิจกรรมยิงธนู (Meditation with Archery Activity)"
+	},
+	{
+		"classID": "01175121",
+		"nameTH": "บาสเกตบอลเพื่อสุขภาพ",
+		"nameEN": "Basketball for Health",
+		"label": "01175121 บาสเกตบอลเพื่อสุขภาพ (Basketball for Health)"
+	},
+	{
+		"classID": "01175122",
+		"nameTH": "ฟุตบอลเพื่อสุขภาพ",
+		"nameEN": "Soccer for Health",
+		"label": "01175122 ฟุตบอลเพื่อสุขภาพ (Soccer for Health)"
+	},
+	{
+		"classID": "01175123",
+		"nameTH": "วอลเลย์บอลเพื่อสุขภาพ",
+		"nameEN": "Volleyball for Health",
+		"label": "01175123 วอลเลย์บอลเพื่อสุขภาพ (Volleyball for Health)"
+	},
+	{
+		"classID": "01175124",
+		"nameTH": "แฮนด์บอลเพื่อสุขภาพ",
+		"nameEN": "Handball for Health",
+		"label": "01175124 แฮนด์บอลเพื่อสุขภาพ (Handball for Health)"
+	},
+	{
+		"classID": "01175125",
+		"nameTH": "ซอฟท์บอลเพื่อสุขภาพ",
+		"nameEN": "Softball for Health",
+		"label": "01175125 ซอฟท์บอลเพื่อสุขภาพ (Softball for Health)"
+	},
+	{
+		"classID": "01175126",
+		"nameTH": "ตะกร้อเพื่อสุขภาพ",
+		"nameEN": "Takraw for Health",
+		"label": "01175126 ตะกร้อเพื่อสุขภาพ (Takraw for Health)"
+	},
+	{
+		"classID": "01175127",
+		"nameTH": "ฮอกกี้เพื่อสุขภาพ",
+		"nameEN": "Hockey for Health",
+		"label": "01175127 ฮอกกี้เพื่อสุขภาพ (Hockey for Health)"
+	},
+	{
+		"classID": "01175128",
+		"nameTH": "รักบี้ฟุตบอลเพื่อสุขภาพ",
+		"nameEN": "Rugby Football for Health",
+		"label": "01175128 รักบี้ฟุตบอลเพื่อสุขภาพ (Rugby Football for Health)"
+	},
+	{
+		"classID": "01175129",
+		"nameTH": "ฟุตซอลเพื่อสุขภาพ",
+		"nameEN": "Futsal for Health",
+		"label": "01175129 ฟุตซอลเพื่อสุขภาพ (Futsal for Health)"
+	},
+	{
+		"classID": "01175131",
+		"nameTH": "ว่ายน้ำเพื่อสุขภาพ",
+		"nameEN": "Swimming for Health",
+		"label": "01175131 ว่ายน้ำเพื่อสุขภาพ (Swimming for Health)"
+	},
+	{
+		"classID": "01175133",
+		"nameTH": "กระโดดน้ำ",
+		"nameEN": "Diving",
+		"label": "01175133 กระโดดน้ำ (Diving)"
+	},
+	{
+		"classID": "01175134",
+		"nameTH": "โปโลน้ำ",
+		"nameEN": "Water Polo",
+		"label": "01175134 โปโลน้ำ (Water Polo)"
+	},
+	{
+		"classID": "01175141",
+		"nameTH": "การเต้นแอโรบิกเพื่อสุขภาพ",
+		"nameEN": "Aerobic Dance for Health",
+		"label": "01175141 การเต้นแอโรบิกเพื่อสุขภาพ (Aerobic Dance for Health)"
+	},
+	{
+		"classID": "01175142",
+		"nameTH": "การเต้นรำพื้นเมืองตามวัฒนธรรมท้องถิ่นเพื่อสุขภาพ",
+		"nameEN": "Folk Dance by Local Culture for Health",
+		"label": "01175142 การเต้นรำพื้นเมืองตามวัฒนธรรมท้องถิ่นเพื่อสุขภาพ (Folk Dance by Local Culture for Health)"
+	},
+	{
+		"classID": "01175143",
+		"nameTH": "การเต้นลีลาศเพื่อสุขภาพ",
+		"nameEN": "Social Dance for Health",
+		"label": "01175143 การเต้นลีลาศเพื่อสุขภาพ (Social Dance for Health)"
+	},
+	{
+		"classID": "01175144",
+		"nameTH": "รำไทยเพื่อสุขภาพ",
+		"nameEN": "Thai Classical Dance for Health",
+		"label": "01175144 รำไทยเพื่อสุขภาพ (Thai Classical Dance for Health)"
+	},
+	{
+		"classID": "01175151",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยดาบไทย",
+		"nameEN": "Martial Art with Thai Sword",
+		"label": "01175151 ศิลปะการป้องกันตัวและการต่อสู้ด้วยดาบไทย (Martial Art with Thai Sword)"
+	},
+	{
+		"classID": "01175152",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยดาบสากล",
+		"nameEN": "Martial Art with Fencing",
+		"label": "01175152 ศิลปะการป้องกันตัวและการต่อสู้ด้วยดาบสากล (Martial Art with Fencing)"
+	},
+	{
+		"classID": "01175153",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยมวยไทย",
+		"nameEN": "Martial Art with Thai Boxing",
+		"label": "01175153 ศิลปะการป้องกันตัวและการต่อสู้ด้วยมวยไทย (Martial Art with Thai Boxing)"
+	},
+	{
+		"classID": "01175154",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยมวยสากล",
+		"nameEN": "Martial Art with Boxing",
+		"label": "01175154 ศิลปะการป้องกันตัวและการต่อสู้ด้วยมวยสากล (Martial Art with Boxing)"
+	},
+	{
+		"classID": "01175155",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยยูโด",
+		"nameEN": "Martial Art with Judo",
+		"label": "01175155 ศิลปะการป้องกันตัวและการต่อสู้ด้วยยูโด (Martial Art with Judo)"
+	},
+	{
+		"classID": "01175156",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยไอกิโด",
+		"nameEN": "Martial Art with Aikido",
+		"label": "01175156 ศิลปะการป้องกันตัวและการต่อสู้ด้วยไอกิโด (Martial Art with Aikido)"
+	},
+	{
+		"classID": "01175157",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยกระบี่กระบอง",
+		"nameEN": "Martial Art with Krabi-Krabong",
+		"label": "01175157 ศิลปะการป้องกันตัวและการต่อสู้ด้วยกระบี่กระบอง (Martial Art with Krabi-Krabong)"
+	},
+	{
+		"classID": "01175159",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยคาราเต้",
+		"nameEN": "Martial Art with Karate",
+		"label": "01175159 ศิลปะการป้องกันตัวและการต่อสู้ด้วยคาราเต้ (Martial Art with Karate)"
+	},
+	{
+		"classID": "01175161",
+		"nameTH": "ฝึกสมองด้วยการเล่นบริดจ์",
+		"nameEN": "Brain Training with Playing Bridge",
+		"label": "01175161 ฝึกสมองด้วยการเล่นบริดจ์ (Brain Training with Playing Bridge)"
+	},
+	{
+		"classID": "01175162",
+		"nameTH": "โบว์ลิ่งเพื่อสุขภาพ",
+		"nameEN": "Bowling for Health",
+		"label": "01175162 โบว์ลิ่งเพื่อสุขภาพ (Bowling for Health)"
+	},
+	{
+		"classID": "01175163",
+		"nameTH": "กอล์ฟเพื่อสุขภาพ",
+		"nameEN": "Golf for Health",
+		"label": "01175163 กอล์ฟเพื่อสุขภาพ (Golf for Health)"
+	},
+	{
+		"classID": "01175164",
+		"nameTH": "จักรยานเพื่อสุขภาพ",
+		"nameEN": "Cycling for Health",
+		"label": "01175164 จักรยานเพื่อสุขภาพ (Cycling for Health)"
+	},
+	{
+		"classID": "01175165",
+		"nameTH": "การฝึกด้วยน้ำหนักเพื่อสุขภาพ",
+		"nameEN": "Weight Training for Health",
+		"label": "01175165 การฝึกด้วยน้ำหนักเพื่อสุขภาพ (Weight Training for Health)"
+	},
+	{
+		"classID": "01175166",
+		"nameTH": "ศิลปะการป้องกันตัวและการต่อสู้ด้วยเทควันโด",
+		"nameEN": "Martial Art with Taekwondo",
+		"label": "01175166 ศิลปะการป้องกันตัวและการต่อสู้ด้วยเทควันโด (Martial Art with Taekwondo)"
+	},
+	{
+		"classID": "01175168",
+		"nameTH": "การวิ่งเหยาะเพื่อสุขภาพ",
+		"nameEN": "Jogging for Health",
+		"label": "01175168 การวิ่งเหยาะเพื่อสุขภาพ (Jogging for Health)"
+	},
+	{
+		"classID": "01175169",
+		"nameTH": "การออกกาลังกายเพื่อพัฒนาสุขภาพแบบองค์รวม",
+		"nameEN": "Exercise for developing Holistic Health",
+		"label": "01175169 การออกกาลังกายเพื่อพัฒนาสุขภาพแบบองค์รวม (Exercise for developing Holistic Health)"
+	},
+	{
+		"classID": "03768111",
+		"nameTH": "เปตอง",
+		"nameEN": "Pe’tanque",
+		"label": "03768111 เปตอง (Pe’tanque)"
+	},
+	{
+		"classID": "03768112",
+		"nameTH": "การฝึกโดยการใช้น้ำหนัก",
+		"nameEN": "Weight Training",
+		"label": "03768112 การฝึกโดยการใช้น้ำหนัก  (Weight Training)"
+	},
+	{
+		"classID": "03768121",
+		"nameTH": "บาสเกตบอล",
+		"nameEN": "Basketball",
+		"label": "03768121 บาสเกตบอล (Basketball)"
+	},
+	{
+		"classID": "03768141",
+		"nameTH": "นาฏศิลป์และลีลาศ",
+		"nameEN": "Thai Classical and Social Dances",
+		"label": "03768141 นาฏศิลป์และลีลาศ (Thai Classical and Social Dances)"
+	},
+	{
+		"classID": "03768151",
+		"nameTH": "กระบี่กระบอง",
+		"nameEN": "Sword and Pole Fighting",
+		"label": "03768151 กระบี่กระบอง (Sword and Pole Fighting)"
+	},
+	{
+		"classID": "01173151",
+		"nameTH": "เอดส์ศึกษา",
+		"nameEN": "AIDS Education",
+		"label": "01173151 เอดส์ศึกษา (AIDS Education)"
+	},
+	{
+		"classID": "01174231",
+		"nameTH": "นันทนาการเบื้องต้น1",
+		"nameEN": "Introduction to Recreation",
+		"label": "01174231 นันทนาการเบื้องต้น1 (Introduction to Recreation)"
+	},
+	{
+		"classID": "01387101",
+		"nameTH": "ศิลปะการอยู่ร่วมกับผู้อื่น",
+		"nameEN": "The Art of Living with Others",
+		"label": "01387101 ศิลปะการอยู่ร่วมกับผู้อื่น (The Art of Living with Others)"
+	},
+	{
+		"classID": "01387103",
+		"nameTH": "ปรัชญาเศรษฐกิจพอเพียงกับพุทธศาสนา",
+		"nameEN": "Philosophy of Sufficiency Economics and Buddhism",
+		"label": "01387103 ปรัชญาเศรษฐกิจพอเพียงกับพุทธศาสนา (Philosophy of Sufficiency Economics and Buddhism)"
+	},
+	{
+		"classID": "01459101",
+		"nameTH": "จิตวิทยาเพื่อชีวิตสมัยใหม่",
+		"nameEN": "Psychology for Modern Life",
+		"label": "01459101 จิตวิทยาเพื่อชีวิตสมัยใหม่ (Psychology for Modern Life)"
+	},
+	{
+		"classID": "01459102",
+		"nameTH": "จิตวิทยากับความหลากหลายของมนุษย์",
+		"nameEN": "Psychology and Human Diversity",
+		"label": "01459102 จิตวิทยากับความหลากหลายของมนุษย์ (Psychology and Human Diversity)"
+	},
+	{
+		"classID": "01999011",
+		"nameTH": "อาหารเพื่อมนุษยชาติ",
+		"nameEN": "Food for Mankind",
+		"label": "01999011 อาหารเพื่อมนุษยชาติ (Food for Mankind)"
+	},
+	{
+		"classID": "01999012",
+		"nameTH": "สุขภาพเพื่อชีวิต",
+		"nameEN": "Health for Life",
+		"label": "01999012 สุขภาพเพื่อชีวิต (Health for Life)"
+	},
+	{
+		"classID": "01999033",
+		"nameTH": "ศิลปะการดำเนินชีวิต",
+		"nameEN": "Arts of Living",
+		"label": "01999033 ศิลปะการดำเนินชีวิต (Arts of Living)"
+	},
+	{
+		"classID": "01999036",
+		"nameTH": "ความสุขในพลวัตของชีวิต",
+		"nameEN": "Happiness amongst Life Dynamics",
+		"label": "01999036 ความสุขในพลวัตของชีวิต (Happiness amongst Life Dynamics)"
+	},
+	{
+		"classID": "01999048",
+		"nameTH": "นวัตกรรมเพื่อสิ่งแวดล้อมและสุขภาวะ",
+		"nameEN": "Innovation for Environment and Health",
+		"label": "01999048 นวัตกรรมเพื่อสิ่งแวดล้อมและสุขภาวะ (Innovation for Environment and Health)"
+	},
+	{
+		"classID": "01999213",
+		"nameTH": "สิ่งแวดล้อม",
+		"nameEN": "Environment, Technology and Life",
+		"label": "01999213 สิ่งแวดล้อม เทคโนโลยี และชีวิต (Environment, Technology and Life)"
+	},
+	{
+		"classID": "02032303",
+		"nameTH": "การเกษตรกับคุณภาพชีวิตที่ดี",
+		"nameEN": "Agriculture and Quality of Life",
+		"label": "02032303 การเกษตรกับคุณภาพชีวิตที่ดี (Agriculture and Quality of Life)"
+	},
+	{
+		"classID": "02999044",
+		"nameTH": "เศรษฐกิจพอเพียงเพื่อการดำรงชีวิต",
+		"nameEN": "Sufficiency Economy for Living",
+		"label": "02999044 เศรษฐกิจพอเพียงเพื่อการดำรงชีวิต (Sufficiency Economy for Living)"
+	},
+	{
+		"classID": "02999045",
+		"nameTH": "การเพิ่มคุณค่าชีวิตด้วยวิถีชุมชนชนบท",
+		"nameEN": "Enhancement of Living Value Through Rural Community Path",
+		"label": "02999045 การเพิ่มคุณค่าชีวิตด้วยวิถีชุมชนชนบท (Enhancement of Living Value Through Rural Community Path)"
+	},
+	{
+		"classID": "04401112",
+		"nameTH": "บุคลิกภาพและมารยาททางสังคมสาหรับการบริการชุมชน",
+		"nameEN": "Personality and Social Etiquette for Community Service",
+		"label": "04401112 บุคลิกภาพและมารยาททางสังคมสาหรับการบริการชุมชน (Personality and Social Etiquette for Community Service)"
+	},
+	{
+		"classID": "04804311",
+		"nameTH": "ปรัชญาเศรษฐกิจพอเพียง",
+		"nameEN": "Philosophy of Sufficiency Economy",
+		"label": "04804311 ปรัชญาเศรษฐกิจพอเพียง (Philosophy of Sufficiency Economy)"
+	},
+	{
+		"classID": "01999051",
+		"nameTH": "การพัฒนาสมรรถนะหลักผ่านสุขภาพหนึ่งเดียว",
+		"nameEN": "Development of Core Competency through One Health",
+		"label": "01999051 การพัฒนาสมรรถนะหลักผ่านสุขภาพหนึ่งเดียว (Development of Core Competency through One Health)"
+	}
+]
