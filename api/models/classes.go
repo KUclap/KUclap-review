@@ -1,9 +1,9 @@
 package models
 
 type Classes struct {
-	ClassID		string			`json:"classID"`
-	NameTH		string			`json:"nameTH"`
-	NameEN		string			`json:"nameEN"`
+	ClassId		string			`json:"classId"`
+	NameTh		string			`json:"nameTh"`
+	NameEn		string			`json:"nameEn"`
 	Label		string			`json:"label"`
 	
 }

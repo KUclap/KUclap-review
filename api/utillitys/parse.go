@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"io/ioutil"
-	"../models"
+	"github.com/marsDev31/kuclap-backend/api/models"
 )
 
 
