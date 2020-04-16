@@ -68,6 +68,12 @@ func (m *SessionDAO) UpdateStatsClass(classId string, newStats models.StatClass)
 	return err
 }
 
+// Update number of review
+func (m *SessionDAO) UpdateNuberReviewByClassId(classId string, updateAt time.Time) error {
+	err := db.C(CCLASSES).Update(bson.M{"class_id": classId}, bson.M{"$inc": bson.M{"number_reviewer": 1}})
+	return err
+}
+
 // Find class by class_id
 func (m *SessionDAO) FindClassByClassId(classId string) (models.Class, error) {
 	var class models.Class

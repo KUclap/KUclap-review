@@ -156,15 +156,17 @@ func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var review models.Review
+
 	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
+
 	review.CreatedAt = time.Now().UTC().Add(7 *time.Hour) // Parse UTC to GTM+7 Thailand's timezone.
 	review.UpdateAt = review.CreatedAt
 	review.ID = bson.NewObjectId()
 	review.Auth = getRemoteAddr(r)
-
+	
 	if err := mdao.Insert(review); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -252,14 +254,14 @@ func main() {
 	// boo 
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
-	r.HandleFunc("/class/{classid}", InsertClassEndpoint).Methods("POST")
-	r.HandleFunc("/classes/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
-	r.HandleFunc("/review/last", LastReviewsEndPoint).Methods("GET")
+	r.HandleFunc("/class", InsertClassEndpoint).Methods("POST")
+	// r.HandleFunc("/classes/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews/last", LastReviewsEndPoint).Methods("GET")
+	r.HandleFunc("/review", CreateReviewEndPoint).Methods("POST")
 	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIdEndPoint).Methods("GET")
-	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
-	r.HandleFunc("/reviews/report/{id}", UpdateReportByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/reviews/{id}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/reviews/{id}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/report/{id}", UpdateReportByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/{id}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/{id}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", DeleteReviewEndPoint).Methods("DELETE")
