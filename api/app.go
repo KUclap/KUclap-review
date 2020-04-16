@@ -17,7 +17,7 @@ import (
 	"github.com/marsDev31/kuclap-backend/api/models"
 )
 
-
+var limiter = NewIPRateLimiter(1, 5)
 var mcf = config.Config{}
 var mdao = dao.SessionDAO{}
 
@@ -31,7 +31,7 @@ func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	stats.UpdateAt = time.Now().UTC().Add(7 *time.Hour) 
-	if err := mdao.UpdateStatsClass(params["classId"], stats); err != nil {
+	if err := mdao.UpdateStatsClass(params["classid"], stats); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -106,6 +106,8 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	review.CreatedAt = time.Now().UTC().Add(7 *time.Hour) // Parse UTC to GTM+7 Thailand's timezone.
 	review.UpdateAt = review.CreatedAt
 	review.ID = bson.NewObjectId()
+	review.Auth = getRemoteAddr(r)
+
 	if err := mdao.Insert(review); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -164,13 +166,13 @@ func Root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/marsDev31/kuclap-backend.")
 }
 
-// func getIP(r *http.Request) string {
-// 	forwarded := r.Header.Get("X-FORWARDED-FOR")
-// 	if forwarded != "" {
-// 		return forwarded
-// 	}
-// 	return r.RemoteAddr
-// }
+func getRemoteAddr(r *http.Request) string {
+	forwarded := r.Header.Get("X-FORWARDED-FOR")
+	if forwarded != "" {
+		return forwarded
+	}
+	return r.RemoteAddr
+}
 
 //  Getter environment from .env.
 func goDotEnvVariable(key string) string {
@@ -226,7 +228,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
-	r.HandleFunc("/classes/{classId}/stats", UpdateStatsEndPoint).Methods("PUT")
+	r.HandleFunc("/classes/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
 	r.HandleFunc("/last", LastReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
@@ -234,10 +236,21 @@ func main() {
 	r.HandleFunc("/reviews", DeleteReviewEndPoint).Methods("DELETE")
 	r.HandleFunc("/reviews/{id}", FindReviewEndpoint).Methods("GET")
 
-	if err := http.ListenAndServe(":" + port, r); err != nil {
+	if err := http.ListenAndServe(":" + port, limitMiddleware(r)); err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Listening on port " + port)
-	
-	
+	log.Println("Listening on port " + port)	
+}
+
+// Rate Limit base on IP (r = tokens per second, b = maximum burst size of b events)
+func limitMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		limiter := limiter.GetLimiter(r.RemoteAddr)
+		if !limiter.Allow() {
+			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
