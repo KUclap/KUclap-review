@@ -27,7 +27,7 @@ func main(){
 
 	// Make slice of Classes (KUclap version)
 	for _, class := range classesOld {
-		newStat := models.StatClass{0,0,0, time.Now().UTC().Add(7 *time.Hour) }
+		newStat := models.StatClass{0,0,0, time.Now().UTC() }
 
 		new := models.Class{
 			class.Value,

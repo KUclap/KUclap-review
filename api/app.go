@@ -27,11 +27,21 @@ func getNewStats(oldN float64, oldstat float64, newStats float64) float64 {
 	return ((newStats / 5 * 100) + (oldstat * oldN)) / (oldN + 1)
 }
 
+// GET class by class_id
+func FindClassByClassIdEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	class, err := mdao.FindClassByClassId(params["classid"])
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, class)
+}
 
 // PUT update clap by id
 func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	updateAt := time.Now().UTC().Add(7 *time.Hour)
+	updateAt := time.Now().UTC()
 	iclap, _ := strconv.ParseUint(params["clap"],10 ,32)
 	if err := mdao.UpdateClapById(params["id"], iclap, updateAt); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -43,7 +53,7 @@ func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 // PUT update boo by id
 func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	updateAt := time.Now().UTC().Add(7 *time.Hour)
+	updateAt := time.Now().UTC()
 	iboo, _ := strconv.ParseUint(params["boo"],10, 32)
 	if err := mdao.UpdateBooById(params["id"], iboo, updateAt); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -54,9 +64,10 @@ func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 
 // GET report of reviews by class_id
 func UpdateReportByIdEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	params := mux.Vars(r)
-	updateAt := time.Now().UTC().Add(7 *time.Hour)
-	
+	updateAt := time.Now().UTC()
+
 	if err := mdao.UpdateReportById(params["id"], updateAt); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review id")
 		return
@@ -69,7 +80,7 @@ func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
 	var newStats models.StatClass
-	var class models.Class
+	var class models.Class	
 
 	if err := json.NewDecoder(r.Body).Decode(&newStats); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
@@ -86,7 +97,7 @@ func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 	newStats.How = getNewStats(class.NumberReviewer, oldStats.How, newStats.How)
 	newStats.Homework = getNewStats(class.NumberReviewer, oldStats.Homework, newStats.Homework)
 	newStats.Interest = getNewStats(class.NumberReviewer, oldStats.Interest, newStats.Interest)
-	newStats.UpdateAt = time.Now().UTC().Add(7 *time.Hour) 
+	newStats.UpdateAt = time.Now().UTC() 
 	
 	if err = mdao.UpdateStatsClass(params["classid"], newStats); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -123,9 +134,10 @@ func InsertClassEndpoint(w http.ResponseWriter, r * http.Request){
 // GET list of reviews by class_id
 func AllReviewsByClassIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+	// var reviews []models.Review
 	reviews, err := mdao.FindReviewsByClassId(params["classid"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid review offset")
+		respondWithError(w, http.StatusBadRequest, "Invalid review classid")
 		return
 	}
 	respondWithJson(w, http.StatusOK, reviews)
@@ -162,11 +174,11 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	review.CreatedAt = time.Now().UTC().Add(7 *time.Hour) // Parse UTC to GTM+7 Thailand's timezone.
+	review.CreatedAt = time.Now().UTC() // Parse UTC to GTM+7 Thailand's timezone.
 	review.UpdateAt = review.CreatedAt
 	review.ID = bson.NewObjectId()
 	review.Auth = getRemoteAddr(r)
-	
+
 	if err := mdao.Insert(review); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -179,57 +191,21 @@ func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r) //  param on endpoint
 	review, err := mdao.FindById(params["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid review ID")
+		respondWithError(w, http.StatusBadRequest, "Invalid review Id or haven't your id in DB")
 		return
 	}
 	respondWithJson(w, http.StatusOK, review)
 }
 
-
-// PUT update an existing review
-func UpdateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
+// DELETE an existing review
+func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
-	var review models.Review
-
-	review.UpdateAt = time.Now().UTC().Add(7 *time.Hour)
-	review.ID = bson.ObjectIdHex(params["id"])
-
-	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-	if err := mdao.Update(review); err != nil {
+	if err := mdao.DeleteById(params["id"]); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
-}
-
-// DELETE an existing review
-func DeleteReviewEndPoint(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	var review models.Review
-	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-	if err := mdao.Delete(review); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
-}
-
-func respondWithError(w http.ResponseWriter, code int, msg string) {
-	respondWithJson(w, code, map[string]string{"error": msg})
-}
-
-func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(payload)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(response)
 }
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
@@ -250,22 +226,24 @@ func main() {
 	fmt.Println("Starting services.")
 	r := mux.NewRouter()
 
-	// clap
-	// boo 
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
 	r.HandleFunc("/class", InsertClassEndpoint).Methods("POST")
-	// r.HandleFunc("/classes/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
+	r.HandleFunc("/class/{classid}", FindClassByClassIdEndpoint).Methods("GET")
+	r.HandleFunc("/class/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews/last", LastReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/review", CreateReviewEndPoint).Methods("POST")
 	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIdEndPoint).Methods("GET")
+	r.HandleFunc("/review/{id}", FindReviewEndpoint).Methods("GET")
 	r.HandleFunc("/review/report/{id}", UpdateReportByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/review/{id}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/review/{id}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/clap/{id}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/boo/{id}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
-	r.HandleFunc("/reviews", DeleteReviewEndPoint).Methods("DELETE")
-	r.HandleFunc("/reviews/{id}", FindReviewEndpoint).Methods("GET")
+	r.HandleFunc("/review/{id}", DeleteReviewByIdEndPoint).Methods("DELETE")
+	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
+	// r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
+	
+	
 
 	if err := http.ListenAndServe(":" + port, limitMiddleware(r)); err != nil {
 		log.Fatal(err)
@@ -291,10 +269,21 @@ func Root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/marsDev31/kuclap-backend.")
 }
 
+func respondWithError(w http.ResponseWriter, code int, msg string) {
+	respondWithJson(w, code, map[string]string{"error": msg})
+}
+
+func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
+}
 
 func getRemoteAddr(r *http.Request) string {
 	forwarded := r.Header.Get("X-FORWARDED-FOR")
 	if forwarded != "" {
+		fmt.Println(forwarded)
 		return forwarded
 	}
 	return r.RemoteAddr
@@ -332,3 +321,33 @@ func initialClasses(){
 		insetClasstoDatabase(class)
 	}
 }
+
+// GET class by class_id
+// func FindReviewReportedEndpoint(w http.ResponseWriter, r *http.Request) {
+// 	reviews, err := mdao.FindReviewsReported()
+// 	if err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, err.Error())
+// 		return
+// 	}
+// 	respondWithJson(w, http.StatusOK, reviews)
+// }
+
+// PUT update an existing review
+// func UpdateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
+// 	defer r.Body.Close()
+// 	params := mux.Vars(r)
+// 	var review models.Review
+
+// 	review.UpdateAt = time.Now().UTC()
+// 	review.ID = bson.ObjectIdHex(params["id"])
+
+// 	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
+// 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+// 		return
+// 	}
+// 	if err := mdao.Update(review); err != nil {
+// 		respondWithError(w, http.StatusInternalServerError, err.Error())
+// 		return
+// 	}
+// 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+// }

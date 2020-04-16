@@ -46,25 +46,25 @@ func (m *SessionDAO) Connect() {
 
 // Update clap by id
 func (m *SessionDAO) UpdateClapById(id string, newClap uint64, updateAt time.Time) error {
-	err := db.C(CREVIEWS).Update(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newClap}, "$set": bson.M{"update_at": updateAt}})
+	err := db.C(CREVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newClap}, "$set": bson.M{"update_at": updateAt}})
 	return err
 }
 
 // Update boo by id
 func (m *SessionDAO) UpdateBooById(id string, newBoo uint64, updateAt time.Time) error {
-	err := db.C(CREVIEWS).Update(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newBoo}, "$set": bson.M{"update_at": updateAt}})
+	err := db.C(CREVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"boo": newBoo}, "$set": bson.M{"update_at": updateAt}})
 	return err
 }
 
 // Update reported
 func (m *SessionDAO) UpdateReportById(id string, updateAt time.Time) error {
-	err := db.C(CREVIEWS).Update(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"reported": true, "update_at": updateAt}})
+	err := db.C(CREVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"reported": true, "update_at": updateAt}})
 	return err
 }
 
 // Update stats on class by class_id 
 func (m *SessionDAO) UpdateStatsClass(classId string, newStats models.StatClass) error {
-	err := db.C(CCLASSES).Update(bson.M{"class_id": classId}, bson.M{"$set": bson.M{"stats": newStats}})
+	err := db.C(CCLASSES).Update(bson.M{"class_id": classId}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": 1}})
 	return err
 }
 
@@ -95,8 +95,8 @@ func (m *SessionDAO) InsertClass(class models.Class) error {
 }
 
 // Find reviews by class_id
-func (m *SessionDAO) FindReviewsByClassId(classId string) ([]models.Class, error) {
-	var reviews []models.Class
+func (m *SessionDAO) FindReviewsByClassId(classId string) ([]models.Review, error) {
+	var reviews []models.Review
 	err := db.C(CREVIEWS).Find(bson.M{"class_id": classId}).All(&reviews)
 	return reviews, err
 }
@@ -133,13 +133,20 @@ func (m *SessionDAO) Insert(review models.Review) error {
 }
 
 // Delete an existing review
-func (m *SessionDAO) Delete(review models.Review) error {
-	err := db.C(CREVIEWS).Remove(&review)
+func (m *SessionDAO) DeleteById(id string) error {
+	err := db.C(CREVIEWS).RemoveId(bson.ObjectIdHex(id))
 	return err
 }
 
+// Find reviews reported
+// func (m *SessionDAO) FindReviewsReported() ([]models.Review, error) {
+// 	var reviews []models.Review
+// 	err := db.C(CREVIEWS).Find(bson.M{"reported": bson.M{"$ne": false}}).All(&reviews)
+// 	return reviews, err
+// }
+
 // Update an existing review
-func (m *SessionDAO) Update(review models.Review) error {
-	err := db.C(CREVIEWS).UpdateId(review.ID, &review)
-	return err
-}
+// func (m *SessionDAO) Update(review models.Review) error {
+// 	err := db.C(CREVIEWS).UpdateId(review.ID, &review)
+// 	return err
+// }
