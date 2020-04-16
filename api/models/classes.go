@@ -8,14 +8,14 @@ type Class struct {
 	Label			string			`json:"label" bson:"label"`
 	Hours			string			`json:"hours" bson:"hours"`
 	Unit			uint			`json:"unit" bson:"unit"`
-	NumberReviewer	uint			`json:"numberReviewer" bson:"number_reviewer"`
+	NumberReviewer	float64			`json:"numberReviewer" bson:"number_reviewer"`
 	Stats			StatClass		`json:"stats" bson:"stats"`	
 }
 
 type StatClass struct {
-	How			float32		`json:"how" bson:"how"`
-	Homework	float32		`json:"homework" bson:"homework"`
-	Interest	float32		`json:"interest" bson:"interest"`
+	How			float64		`json:"how" bson:"how"`
+	Homework	float64		`json:"homework" bson:"homework"`
+	Interest	float64		`json:"interest" bson:"interest"`
 	UpdateAt	time.Time	`json:"updateAt" bson:"update_at"`
 }
 

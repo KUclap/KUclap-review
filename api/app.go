@@ -8,6 +8,7 @@ import (
 	"time"
 	"fmt"
 	"os"
+	"strconv"
 
 	"gopkg.in/mgo.v2/bson"
 	"github.com/joho/godotenv"
@@ -22,14 +23,48 @@ var limiter = middleware.NewIPRateLimiter(200, 10)
 var mcf = config.Config{}
 var mdao = dao.SessionDAO{}
 
-const (
-	"MAXVOTE" = 5
-)
-
-func getNewStats(oldN uint, oldstat float32, newStats float32) float32 {
-	return ((newStats / MAXVOTE * 100) + (oldstat * oldN)) / (oldN + 1)
+func getNewStats(oldN float64, oldstat float64, newStats float64) float64 {
+	return ((newStats / 5 * 100) + (oldstat * oldN)) / (oldN + 1)
 }
 
+
+// PUT update clap by id
+func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	updateAt := time.Now().UTC().Add(7 *time.Hour)
+	iclap, err := strconv.Atoi(params["clap"])
+	if err := mdao.Update(params["id"], iclap, updateAt); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+// PUT update boo by id
+func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	updateAt := time.Now().UTC().Add(7 *time.Hour)
+	iboo, err := strconv.Atoi(params["boo"])
+	if err := mdao.Update(params["id"], iboo, updateAt); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+// GET report of reviews by class_id
+func UpdateReportByIdEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	updateAt := time.Now().UTC().Add(7 *time.Hour)
+	
+	if err := mdao.UpdateReportById(params["id"], updateAt); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid review id")
+		return
+	}
+	respondWithJson(w, http.StatusOK,  map[string]string{"result": "success"})
+}
+
+// PUT stats by class_id
 func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
@@ -48,9 +83,9 @@ func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 	// Process new stats
 	var oldStats = class.Stats
-	newStats.How = getNewStats(classNumberReviewer, oldStats.How, newStats.How)
-	newStats.Homework = getNewStats(classNumberReviewer, oldStats.Homework, newStats.Homework)
-	newStats.Interest = getNewStats(classNumberReviewer, oldStats.Interest, newStats.Interest)
+	newStats.How = getNewStats(class.NumberReviewer, oldStats.How, newStats.How)
+	newStats.Homework = getNewStats(class.NumberReviewer, oldStats.Homework, newStats.Homework)
+	newStats.Interest = getNewStats(class.NumberReviewer, oldStats.Interest, newStats.Interest)
 	newStats.UpdateAt = time.Now().UTC().Add(7 *time.Hour) 
 	
 	if err = mdao.UpdateStatsClass(params["classid"], newStats); err != nil {
@@ -62,7 +97,7 @@ func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 
 // GET list of classes
 func AllClassesEndpoint(w http.ResponseWriter, r *http.Request) {
-	classes, err := mdao.GetAllClasses()
+	classes, err := mdao.FindAllClasses()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -70,6 +105,7 @@ func AllClassesEndpoint(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, classes)
 }
 
+// Create class 
 func InsertClassEndpoint(w http.ResponseWriter, r * http.Request){
 	defer r.Body.Close()
 	var class models.Class
@@ -84,6 +120,16 @@ func InsertClassEndpoint(w http.ResponseWriter, r * http.Request){
 	respondWithJson(w, http.StatusCreated, class)
 }
 
+// GET list of reviews by class_id
+func AllReviewsByClassIdEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	reviews, err := mdao.FindReviewsByClassId(params["classid"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid review offset")
+		return
+	}
+	respondWithJson(w, http.StatusOK, reviews)
+}
 
 // GET list of reviews // Read param on UrlQuery (eg. /last?offset=5 )
 func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -106,17 +152,6 @@ func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, reviews)
 }
 
-// GET a reviews by its ID
-func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r) //  param on endpoint
-	review, err := mdao.FindById(params["id"])
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid review ID")
-		return
-	}
-	respondWithJson(w, http.StatusOK, review)
-}
-
 // POST a new review
 func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -136,6 +171,18 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusCreated, review)
 }
+
+// GET a reviews by its ID
+func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r) //  param on endpoint
+	review, err := mdao.FindById(params["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid review ID")
+		return
+	}
+	respondWithJson(w, http.StatusOK, review)
+}
+
 
 // PUT update an existing review
 func UpdateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -249,12 +296,20 @@ func main() {
 	port := goDotEnvVariable("PORT")
 	fmt.Println("Starting services.")
 	r := mux.NewRouter()
+
+	// clap
+	// boo 
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
+	r.HandleFunc("/class/{classid}", InsertClassEndpoint).Methods("POST")
 	r.HandleFunc("/classes/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
-	r.HandleFunc("/last", LastReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
+	r.HandleFunc("/review/last", LastReviewsEndPoint).Methods("GET")
+	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIdEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
+	r.HandleFunc("/reviews/report/{id}", UpdateReportByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews/{id}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews/{id}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", DeleteReviewEndPoint).Methods("DELETE")
 	r.HandleFunc("/reviews/{id}", FindReviewEndpoint).Methods("GET")

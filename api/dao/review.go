@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"net"
 	"fmt"
+	"time"
 	"strconv"
 
 	"gopkg.in/mgo.v2"
@@ -43,13 +44,31 @@ func (m *SessionDAO) Connect() {
 	fmt.Println("CONNECTED: got session.")
 }
 
+// Update clap by id
+func (m *SessionDAO) UpdateClapById(id string, newClap uint, updateAt time.Time) error {
+	err := db.C(CREVIEWS).Update(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newClap}, "$set": bson.M{"update_at": updateAt}})
+	return err
+}
+
+// Update boo by id
+func (m *SessionDAO) UpdateBooById(id string, newBoo uint, updateAt time.Time) error {
+	err := db.C(CREVIEWS).Update(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newBoo}, "$set": bson.M{"update_at": updateAt}})
+	return err
+}
+
+// Update reported
+func (m *SessionDAO) UpdateReportById(id string, updateAt time.Time) error {
+	err := db.C(CREVIEWS).Update(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"reported": true, "update_at": updateAt}})
+	return err
+}
+
 // Update stats on class by class_id 
 func (m *SessionDAO) UpdateStatsClass(classId string, newStats models.StatClass) error {
 	err := db.C(CCLASSES).Update(bson.M{"class_id": classId}, bson.M{"$set": bson.M{"stats": newStats}})
 	return err
 }
 
-// Find one by class_id
+// Find class by class_id
 func (m *SessionDAO) FindClassByClassId(classId string) (models.Class, error) {
 	var class models.Class
 	err := db.C(CCLASSES).Find(bson.M{"class_id": classId}).One(&class)
@@ -57,7 +76,7 @@ func (m *SessionDAO) FindClassByClassId(classId string) (models.Class, error) {
 }
 
 // Find All of list of classes 
-func (m *SessionDAO) GetAllClasses() ([]models.Class, error) {
+func (m *SessionDAO) FindAllClasses() ([]models.Class, error) {
 	var classes []models.Class
 	err := db.C(CCLASSES).Find(bson.M{}).All(&classes)
 	return classes, err
@@ -67,6 +86,13 @@ func (m *SessionDAO) GetAllClasses() ([]models.Class, error) {
 func (m *SessionDAO) InsertClass(class models.Class) error {
 	err := db.C(CCLASSES).Insert(&class)
 	return err	
+}
+
+// Find reviews by class_id
+func (m *SessionDAO) FindReviewsByClassId(classId string) ([]models.Class, error) {
+	var reviews []models.Class
+	err := db.C(CREVIEWS).Find(bson.M{"class_id": classId}).All(&reviews)
+	return reviews, err
 }
 
 // Find last reviews range with offset
