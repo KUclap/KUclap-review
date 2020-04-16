@@ -32,8 +32,8 @@ func getNewStats(oldN float64, oldstat float64, newStats float64) float64 {
 func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC().Add(7 *time.Hour)
-	iclap, err := strconv.Atoi(params["clap"])
-	if err := mdao.Update(params["id"], iclap, updateAt); err != nil {
+	iclap, _ := strconv.ParseUint(params["clap"],10 ,32)
+	if err := mdao.UpdateClapById(params["id"], iclap, updateAt); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -44,8 +44,8 @@ func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC().Add(7 *time.Hour)
-	iboo, err := strconv.Atoi(params["boo"])
-	if err := mdao.Update(params["id"], iboo, updateAt); err != nil {
+	iboo, _ := strconv.ParseUint(params["boo"],10, 32)
+	if err := mdao.UpdateBooById(params["id"], iboo, updateAt); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

@@ -45,13 +45,13 @@ func (m *SessionDAO) Connect() {
 }
 
 // Update clap by id
-func (m *SessionDAO) UpdateClapById(id string, newClap uint, updateAt time.Time) error {
+func (m *SessionDAO) UpdateClapById(id string, newClap uint64, updateAt time.Time) error {
 	err := db.C(CREVIEWS).Update(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newClap}, "$set": bson.M{"update_at": updateAt}})
 	return err
 }
 
 // Update boo by id
-func (m *SessionDAO) UpdateBooById(id string, newBoo uint, updateAt time.Time) error {
+func (m *SessionDAO) UpdateBooById(id string, newBoo uint64, updateAt time.Time) error {
 	err := db.C(CREVIEWS).Update(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newBoo}, "$set": bson.M{"update_at": updateAt}})
 	return err
 }
