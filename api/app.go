@@ -13,11 +13,12 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/gorilla/mux"
 	"github.com/marsDev31/kuclap-backend/api/config"
+	"github.com/marsDev31/kuclap-backend/api/middleware"
 	"github.com/marsDev31/kuclap-backend/api/dao"
 	"github.com/marsDev31/kuclap-backend/api/models"
 )
 
-var limiter = NewIPRateLimiter(1, 5)
+var limiter = middleware.NewIPRateLimiter(10, 10)
 var mcf = config.Config{}
 var mdao = dao.SessionDAO{}
 
