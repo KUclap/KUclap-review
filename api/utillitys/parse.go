@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 	"strings"
 	"io/ioutil"
-	"github.com/marsDev31/kuclap-backend/api/models"
+	//  "github.com/marsDev31/kuclap-backend/api/models"
+	"../models"
 )
 
 
@@ -25,11 +27,16 @@ func main(){
 
 	// Make slice of Classes (KUclap version)
 	for _, class := range classesOld {
+		newStat := models.StatClass{0,0,0, time.Now().UTC().Add(7 *time.Hour) }
+
 		new := models.Class{
 			class.Value,
 			strings.Fields(class.Label)[1],
 			strings.ReplaceAll(strings.Split(class.Label, "(")[1], ")", ""),
-			class.Label}
+			class.Label,
+			"0-0-0",
+			0,
+			newStat}
 		result = append(result, new)
 	}
 	file, _ := json.MarshalIndent(result, "", "	")

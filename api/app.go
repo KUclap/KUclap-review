@@ -19,23 +19,54 @@ import (
 
 
 var mcf = config.Config{}
-var mdao = dao.ReviewsDAO{}
-var classes []models.Class
+var mdao = dao.SessionDAO{}
 
-// ROOT request
-func Root(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/marsDev31/kuclap-backend.")
+func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	params := mux.Vars(r)
+	var stats models.StatClass
+	// Get payload as json format
+	if err := json.NewDecoder(r.Body).Decode(&stats); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	stats.UpdateAt = time.Now().UTC().Add(7 *time.Hour) 
+	if err := mdao.UpdateStatsClass(params["classId"], stats); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
 // GET list of classes
 func AllClassesEndpoint(w http.ResponseWriter, r *http.Request) {
+	classes, err := mdao.GetAllClasses()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 	respondWithJson(w, http.StatusOK, classes)
 }
 
-// GET list of reviews
+func InsertClassEndpoint(w http.ResponseWriter, r * http.Request){
+	defer r.Body.Close()
+	var class models.Class
+	if err := json.NewDecoder(r.Body).Decode(&class); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if err := mdao.InsertClass(class); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, class)
+}
+
+
+// GET list of reviews // Read param on UrlQuery (eg. /last?offset=5 )
 func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r) //  param on endpoint
-	reviews, err := mdao.LastReviews(params["offset"])
+	offset := r.URL.Query().Get("offset")
+	reviews, err := mdao.LastReviews(offset)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review offset")
 		return
@@ -128,6 +159,19 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
+// ROOT request
+func Root(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/marsDev31/kuclap-backend.")
+}
+
+// func getIP(r *http.Request) string {
+// 	forwarded := r.Header.Get("X-FORWARDED-FOR")
+// 	if forwarded != "" {
+// 		return forwarded
+// 	}
+// 	return r.RemoteAddr
+// }
+
 //  Getter environment from .env.
 func goDotEnvVariable(key string) string {
 	// load .env file
@@ -136,7 +180,30 @@ func goDotEnvVariable(key string) string {
 	  log.Fatalf("Error loading .env file")
 	}
 	return os.Getenv(key)
-  }
+}
+
+func insetClasstoDatabase(class models.Class) {
+	if err := mdao.InsertClass(class); err != nil {
+		fmt.Println("err initial classes : ", err)
+	}
+}
+
+func initialClasses(){
+	// classed.json is old data (KUnit version)
+	// classedParsed.json is old data (KUclap version)
+	var classes []models.Class
+	data, err := ioutil.ReadFile("./classesParsed.json")
+    if err != nil {
+      fmt.Print(err)
+	}
+	err = json.Unmarshal(data, &classes)
+	if err != nil {
+        fmt.Println("error:", err)
+	}
+	for _, class := range classes {
+		insetClasstoDatabase(class)
+	}
+}
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
@@ -147,19 +214,7 @@ func init() {
 	mdao.Server = goDotEnvVariable("SERVER")
 	mdao.Database = mcf.Database
 	mdao.Connect() 
-	
-	// Read json file
-	// classed.json is old data (KUnit version)
-	// classedParsed.json is old data (KUclap version)
-	data, err := ioutil.ReadFile("./classesParsed.json")
-    if err != nil {
-      fmt.Print(err)
-	}
-	
-	err = json.Unmarshal(data, &classes)
-	if err != nil {
-        fmt.Println("error:", err)
-    }
+	initialClasses()
 	
 }
 
@@ -171,6 +226,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
+	r.HandleFunc("/classes/{classId}/stats", UpdateStatsEndPoint).Methods("PUT")
 	r.HandleFunc("/last", LastReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
