@@ -36,6 +36,7 @@ func main(){
 			class.Label,
 			"0-0-0",
 			0,
+			0,
 			newStat}
 		result = append(result, new)
 	}

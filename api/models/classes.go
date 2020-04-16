@@ -2,13 +2,14 @@ package models
 import "time"
 
 type Class struct {
-	ClassId		string			`json:"classId" bson:"class_id"`
-	NameTh		string			`json:"nameTh" bson:"name_th"`
-	NameEn		string			`json:"nameEn" bson:"name_en"`
-	Label		string			`json:"label" bson:"label"`
-	Hours		string			`json:"hours" bson:"hours"`
-	Unit		uint			`json:"unit" bson:"unit"`
-	Stats		StatClass		`json:"stats" bson:"stats"`	
+	ClassId			string			`json:"classId" bson:"class_id"`
+	NameTh			string			`json:"nameTh" bson:"name_th"`
+	NameEn			string			`json:"nameEn" bson:"name_en"`
+	Label			string			`json:"label" bson:"label"`
+	Hours			string			`json:"hours" bson:"hours"`
+	Unit			uint			`json:"unit" bson:"unit"`
+	NumberReviewer	uint			`json:"numberReviewer" bson:"number_reviewer"`
+	Stats			StatClass		`json:"stats" bson:"stats"`	
 }
 
 type StatClass struct {

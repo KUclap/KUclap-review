@@ -49,6 +49,13 @@ func (m *SessionDAO) UpdateStatsClass(classId string, newStats models.StatClass)
 	return err
 }
 
+// Find one by class_id
+func (m *SessionDAO) FindClassByClassId(classId string) (models.Class, error) {
+	var class models.Class
+	err := db.C(CCLASSES).Find(bson.M{"class_id": classId}).One(&class)
+	return class, err
+}
+
 // Find All of list of classes 
 func (m *SessionDAO) GetAllClasses() ([]models.Class, error) {
 	var classes []models.Class

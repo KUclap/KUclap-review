@@ -18,25 +18,46 @@ import (
 	"github.com/marsDev31/kuclap-backend/api/models"
 )
 
-var limiter = middleware.NewIPRateLimiter(10, 10)
+var limiter = middleware.NewIPRateLimiter(200, 10)
 var mcf = config.Config{}
 var mdao = dao.SessionDAO{}
+
+const (
+	"MAXVOTE" = 5
+)
+
+func getNewStats(oldN uint, oldstat float32, newStats float32) float32 {
+	return ((newStats / MAXVOTE * 100) + (oldstat * oldN)) / (oldN + 1)
+}
 
 func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
-	var stats models.StatClass
-	// Get payload as json format
-	if err := json.NewDecoder(r.Body).Decode(&stats); err != nil {
+	var newStats models.StatClass
+	var class models.Class
+
+	if err := json.NewDecoder(r.Body).Decode(&newStats); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	stats.UpdateAt = time.Now().UTC().Add(7 *time.Hour) 
-	if err := mdao.UpdateStatsClass(params["classid"], stats); err != nil {
+
+	class, err := mdao.FindClassByClassId(params["classid"])
+	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+	// Process new stats
+	var oldStats = class.Stats
+	newStats.How = getNewStats(classNumberReviewer, oldStats.How, newStats.How)
+	newStats.Homework = getNewStats(classNumberReviewer, oldStats.Homework, newStats.Homework)
+	newStats.Interest = getNewStats(classNumberReviewer, oldStats.Interest, newStats.Interest)
+	newStats.UpdateAt = time.Now().UTC().Add(7 *time.Hour) 
+	
+	if err = mdao.UpdateStatsClass(params["classid"], newStats); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, newStats)
 }
 
 // GET list of classes
@@ -166,6 +187,7 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 func Root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/marsDev31/kuclap-backend.")
 }
+
 
 func getRemoteAddr(r *http.Request) string {
 	forwarded := r.Header.Get("X-FORWARDED-FOR")
