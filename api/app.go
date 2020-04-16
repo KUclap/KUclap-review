@@ -230,6 +230,60 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
+// Parse the configuration file 'config.toml', and establish a connection to DB
+func init() {
+	fmt.Println("Initial service..")
+	// Conection on database
+	mcf.Read()
+	mdao.Server = goDotEnvVariable("SERVER")
+	mdao.Database = mcf.Database
+	mdao.Connect() 
+	// initialClasses()
+}
+
+// Define HTTP request routes
+func main() {
+	
+	port := goDotEnvVariable("PORT")
+	fmt.Println("Starting services.")
+	r := mux.NewRouter()
+
+	// clap
+	// boo 
+	r.HandleFunc("/", Root).Methods("GET")
+	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
+	r.HandleFunc("/class/{classid}", InsertClassEndpoint).Methods("POST")
+	r.HandleFunc("/classes/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
+	r.HandleFunc("/review/last", LastReviewsEndPoint).Methods("GET")
+	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIdEndPoint).Methods("GET")
+	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
+	r.HandleFunc("/reviews/report/{id}", UpdateReportByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews/{id}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews/{id}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
+	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
+	r.HandleFunc("/reviews", DeleteReviewEndPoint).Methods("DELETE")
+	r.HandleFunc("/reviews/{id}", FindReviewEndpoint).Methods("GET")
+
+	if err := http.ListenAndServe(":" + port, limitMiddleware(r)); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Listening on port " + port)	
+}
+
+// Rate Limit base on IP (r = tokens per second, b = maximum burst size of b events)
+func limitMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		limiter := limiter.GetLimiter(r.RemoteAddr)
+		if !limiter.Allow() {
+			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 // ROOT request
 func Root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/marsDev31/kuclap-backend.")
@@ -275,60 +329,4 @@ func initialClasses(){
 	for _, class := range classes {
 		insetClasstoDatabase(class)
 	}
-}
-
-// Parse the configuration file 'config.toml', and establish a connection to DB
-func init() {
-	fmt.Println("Initial service..")
-
-	// Conection on database
-	mcf.Read()
-	mdao.Server = goDotEnvVariable("SERVER")
-	mdao.Database = mcf.Database
-	mdao.Connect() 
-	initialClasses()
-	
-}
-
-// Define HTTP request routes
-func main() {
-	
-	port := goDotEnvVariable("PORT")
-	fmt.Println("Starting services.")
-	r := mux.NewRouter()
-
-	// clap
-	// boo 
-	r.HandleFunc("/", Root).Methods("GET")
-	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
-	r.HandleFunc("/class/{classid}", InsertClassEndpoint).Methods("POST")
-	r.HandleFunc("/classes/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
-	r.HandleFunc("/review/last", LastReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIdEndPoint).Methods("GET")
-	r.HandleFunc("/reviews", CreateReviewEndPoint).Methods("POST")
-	r.HandleFunc("/reviews/report/{id}", UpdateReportByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/reviews/{id}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/reviews/{id}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
-	r.HandleFunc("/reviews", DeleteReviewEndPoint).Methods("DELETE")
-	r.HandleFunc("/reviews/{id}", FindReviewEndpoint).Methods("GET")
-
-	if err := http.ListenAndServe(":" + port, limitMiddleware(r)); err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Listening on port " + port)	
-}
-
-// Rate Limit base on IP (r = tokens per second, b = maximum burst size of b events)
-func limitMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		limiter := limiter.GetLimiter(r.RemoteAddr)
-		if !limiter.Allow() {
-			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
 }
