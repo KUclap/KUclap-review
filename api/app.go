@@ -13,7 +13,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"github.com/joho/godotenv"
 	"github.com/gorilla/mux"
-	"github.com/marsDev31/kuclap-backend/api/config"
+    "github.com/gorilla/handlers"
+    "github.com/marsDev31/kuclap-backend/api/config"
 	"github.com/marsDev31/kuclap-backend/api/middleware"
 	"github.com/marsDev31/kuclap-backend/api/dao"
 	"github.com/marsDev31/kuclap-backend/api/models"
@@ -224,8 +225,10 @@ func main() {
 	
 	port := goDotEnvVariable("PORT")
 	fmt.Println("Starting services.")
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
+	// originsOk := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 	r := mux.NewRouter()
-
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
 	r.HandleFunc("/class", InsertClassEndpoint).Methods("POST")
@@ -248,7 +251,7 @@ func main() {
 	if err := http.ListenAndServe(":" + port, limitMiddleware(r)); err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Listening on port " + port)	
+	log.Println("Listening on port " + port,  handlers.CORS(headersOk, methodsOk)(r))
 }
 
 // Rate Limit base on IP (r = tokens per second, b = maximum burst size of b events)
