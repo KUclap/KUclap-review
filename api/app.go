@@ -43,7 +43,7 @@ func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC()
 	iclap, _ := strconv.ParseUint(params["clap"],10 ,32)
-	if err := mdao.UpdateClapById(params["id"], iclap, updateAt); err != nil {
+	if err := mdao.UpdateClapById(params["reviewid"], iclap, updateAt); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -55,7 +55,7 @@ func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC()
 	iboo, _ := strconv.ParseUint(params["boo"],10, 32)
-	if err := mdao.UpdateBooById(params["id"], iboo, updateAt); err != nil {
+	if err := mdao.UpdateBooById(params["reviewid"], iboo, updateAt); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -68,7 +68,7 @@ func UpdateReportByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC()
 
-	if err := mdao.UpdateReportById(params["id"], updateAt); err != nil {
+	if err := mdao.UpdateReportById(params["reviewid"], updateAt); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review id")
 		return
 	}
@@ -189,7 +189,7 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 // GET a reviews by its ID
 func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r) //  param on endpoint
-	review, err := mdao.FindById(params["id"])
+	review, err := mdao.FindById(params["reviewid"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review Id or haven't your id in DB")
 		return
@@ -201,7 +201,7 @@ func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
-	if err := mdao.DeleteById(params["id"]); err != nil {
+	if err := mdao.DeleteById(params["reviewid"]); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -234,14 +234,14 @@ func main() {
 	r.HandleFunc("/reviews/last", LastReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/review", CreateReviewEndPoint).Methods("POST")
 	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIdEndPoint).Methods("GET")
-	r.HandleFunc("/review/{id}", FindReviewEndpoint).Methods("GET")
-	r.HandleFunc("/review/report/{id}", UpdateReportByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/review/clap/{id}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/review/boo/{id}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/{reviewid}", FindReviewEndpoint).Methods("GET")
+	r.HandleFunc("/review/report/{reviewid}", UpdateReportByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/clap/{reviewid}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/boo/{reviewid}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/review/{id}", DeleteReviewByIdEndPoint).Methods("DELETE")
+	r.HandleFunc("/review/{reviewid}", DeleteReviewByIdEndPoint).Methods("DELETE")
 	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
-	// r.HandleFunc("/reviews/{id}", UpdateReviewEndPoint).Methods("PUT")
+	// r.HandleFunc("/reviews/{reviewid}", UpdateReviewEndPoint).Methods("PUT")
 	
 	
 
@@ -339,7 +339,7 @@ func initialClasses(){
 // 	var review models.Review
 
 // 	review.UpdateAt = time.Now().UTC()
-// 	review.ID = bson.ObjectIdHex(params["id"])
+// 	review.ID = bson.ObjectIdHex(params["reviewid"])
 
 // 	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
 // 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
