@@ -135,8 +135,9 @@ func InsertClassEndpoint(w http.ResponseWriter, r * http.Request){
 // GET list of reviews by class_id
 func AllReviewsByClassIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	// var reviews []models.Review
-	reviews, err := mdao.FindReviewsByClassId(params["classid"])
+	page := r.URL.Query().Get("page")
+	offset := r.URL.Query().Get("offset")
+	reviews, err := mdao.FindReviewsByClassId(params["classid"], page, offset)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review classid")
 		return
@@ -145,9 +146,11 @@ func AllReviewsByClassIdEndPoint(w http.ResponseWriter, r *http.Request) {
 }
 
 // GET list of reviews // Read param on UrlQuery (eg. /last?offset=5 )
+// Paging by query: page={number_page} offset={number_offset}
 func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
+	page := r.URL.Query().Get("page")
 	offset := r.URL.Query().Get("offset")
-	reviews, err := mdao.LastReviews(offset)
+	reviews, err := mdao.LastReviews(page ,offset)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review offset")
 		return
@@ -248,10 +251,10 @@ func main() {
 	
 	
 
-	if err := http.ListenAndServe(":" + port, limitMiddleware(r)); err != nil {
+	if err := http.ListenAndServe(":" + port, limitMiddleware(handlers.CORS(headersOk, methodsOk)(r))); err != nil {
 		log.Fatal(err)
 	}
-	log.Println("Listening on port " + port,  handlers.CORS(headersOk, methodsOk)(r))
+	log.Println("Listening on port " + port)
 }
 
 // Rate Limit base on IP (r = tokens per second, b = maximum burst size of b events)

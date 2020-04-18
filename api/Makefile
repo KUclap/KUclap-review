@@ -1,8 +1,11 @@
 pkg = github.com/marsDev31/kuclap-backend/api
+APP = kuclap-api
+DYNO = web
 uppkg: push-and-get-go
 goget: go-get
 herokucp: heroku-container-push-web
-herokucr: heroku-container-release-web:
+herokucr: heroku-container-release-web
+hpr: cp-cr
 
 go-get:
 	go get -u ${pkg}
@@ -17,7 +20,10 @@ heroku-container-login:
 	heroku container:login
 
 heroku-container-push-web:
-	heroku container:push web --app kuclap-api
+	heroku container:push ${DYNO} --app ${APP}
 
 heroku-container-release-web:
-	heroku container:release web --app kuclap-api
+	heroku container:release ${DYNO} --app ${APP}
+
+cp-cr:
+	heroku container:push ${DYNO} --app ${APP} && heroku container:release ${DYNO} --app ${APP}
