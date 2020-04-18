@@ -228,8 +228,9 @@ func main() {
 	
 	port := goDotEnvVariable("PORT")
 	fmt.Println("Starting services.")
-	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
-	// originsOk := handlers.AllowedOrigins([]string{os.Getenv("ORIGIN_ALLOWED")})
+	headersOk := handlers.AllowedHeaders([]string{"Origin", "Authorization", "Content-Type"})
+	exposeOk := handlers.ExposedHeaders([]string{""})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 	r := mux.NewRouter()
 	r.HandleFunc("/", Root).Methods("GET")
@@ -251,7 +252,7 @@ func main() {
 	
 	
 
-	if err := http.ListenAndServe(":" + port, limitMiddleware(handlers.CORS(headersOk, methodsOk)(r))); err != nil {
+	if err := http.ListenAndServe(":" + port, limitMiddleware(handlers.CORS(headersOk, exposeOk, originsOk, methodsOk)(r))); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("Listening on port " + port)
