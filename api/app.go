@@ -228,7 +228,7 @@ func main() {
 	
 	port := goDotEnvVariable("PORT")
 	fmt.Println("Starting services.")
-	headersOk := handlers.AllowedHeaders([]string{"Origin", "Authorization", "Content-Type"})
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Origin", "Authorization", "Content-Type"})
 	exposeOk := handlers.ExposedHeaders([]string{""})
 	originsOk := handlers.AllowedOrigins([]string{"*"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})

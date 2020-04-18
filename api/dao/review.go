@@ -99,7 +99,7 @@ func (m *SessionDAO) FindReviewsByClassId(classId string, page string, offset st
 	var reviews []models.Review
 	iPage, err := strconv.Atoi(page)
 	iOffset, err := strconv.Atoi(offset)
-	err = db.C(CREVIEWS).Find(bson.M{"class_id": classId}).Skip(iPage * iOffset).Limit(iOffset).All(&reviews)
+	err = db.C(CREVIEWS).Find(bson.M{"class_id": classId}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&reviews)
 	return reviews, err
 }
 
