@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"gopkg.in/mgo.v2/bson"
 	"github.com/joho/godotenv"
@@ -203,21 +204,19 @@ func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 
 // DELETE an existing review
 func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	var deleteReview models.RDeleteReview
-	if err := json.NewDecoder(r.Body).Decode(&deleteReview); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-
-	review, err := mdao.FindById(deleteReview.ID)
+	params := mux.Vars(r) 
+	reqToken := r.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, " ")
+	reqAuth := splitToken[1]
+	
+	review, err := mdao.FindById(params["reviewid"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
 		return
 	}
 
-	if review.Auth == deleteReview.Auth {
-		if err := mdao.DeleteById(deleteReview.ID); err != nil {
+	if review.Auth == reqAuth {
+		if err := mdao.DeleteById(params["reviewid"]); err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -261,7 +260,7 @@ func main() {
 	r.HandleFunc("/review/clap/{reviewid}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/review/boo/{reviewid}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/review", DeleteReviewByIdEndPoint).Methods("DELETE")
+	r.HandleFunc("/review/{reviewid}", DeleteReviewByIdEndPoint).Methods("DELETE")
 	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
 	// r.HandleFunc("/reviews/{reviewid}", UpdateReviewEndPoint).Methods("PUT")
 	
