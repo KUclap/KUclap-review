@@ -95,8 +95,8 @@ func (m *SessionDAO) InsertClass(class models.Class) error {
 }
 
 // Find reviews by class_id
-func (m *SessionDAO) FindReviewsByClassId(classId string, page string, offset string) ([]models.Review, error) {
-	var reviews []models.Review
+func (m *SessionDAO) FindReviewsByClassId(classId string, page string, offset string) ([]models.RReview, error) {
+	var reviews []models.RReview
 	iPage, err := strconv.Atoi(page)
 	iOffset, err := strconv.Atoi(offset)
 	err = db.C(CREVIEWS).Find(bson.M{"class_id": classId}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&reviews)
@@ -104,8 +104,8 @@ func (m *SessionDAO) FindReviewsByClassId(classId string, page string, offset st
 }
 
 // Find last reviews range with offset
-func (m *SessionDAO) LastReviews(page string,offset string) ([]models.Review, error) {
-	var reviews []models.Review
+func (m *SessionDAO) LastReviews(page string,offset string) ([]models.RReview, error) {
+	var reviews []models.RReview
 	iPage, err := strconv.Atoi(page)
 	iOffset, err := strconv.Atoi(offset)
 	if err != nil {

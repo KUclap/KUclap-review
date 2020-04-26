@@ -14,6 +14,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/gorilla/mux"
     "github.com/gorilla/handlers"
+
     "github.com/marsDev31/kuclap-backend/api/config"
 	"github.com/marsDev31/kuclap-backend/api/middleware"
 	"github.com/marsDev31/kuclap-backend/api/dao"
@@ -181,7 +182,6 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	review.CreatedAt = time.Now().UTC() // Parse UTC to GTM+7 Thailand's timezone.
 	review.UpdateAt = review.CreatedAt
 	review.ID = bson.NewObjectId()
-	review.Auth = getRemoteAddr(r)
 
 	if err := mdao.Insert(review); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -190,12 +190,12 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusCreated, review)
 }
 
-// GET a reviews by its ID
+// GET a review by its ID
 func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r) //  param on endpoint
 	review, err := mdao.FindById(params["reviewid"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid review Id or haven't your id in DB")
+		respondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
 		return
 	}
 	respondWithJson(w, http.StatusOK, review)
@@ -204,12 +204,27 @@ func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 // DELETE an existing review
 func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	params := mux.Vars(r)
-	if err := mdao.DeleteById(params["reviewid"]); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+	var deleteReview models.RDeleteReview
+	if err := json.NewDecoder(r.Body).Decode(&deleteReview); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+
+	review, err := mdao.FindById(deleteReview.ID)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
+		return
+	}
+
+	if review.Auth == deleteReview.Auth {
+		if err := mdao.DeleteById(deleteReview.ID); err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+	} else {
+		respondWithError(w, http.StatusInternalServerError, "your auth isn't match.")
+	}
 }
 
 // Parse the configuration file 'config.toml', and establish a connection to DB
@@ -246,7 +261,7 @@ func main() {
 	r.HandleFunc("/review/clap/{reviewid}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/review/boo/{reviewid}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/review/{reviewid}", DeleteReviewByIdEndPoint).Methods("DELETE")
+	r.HandleFunc("/review", DeleteReviewByIdEndPoint).Methods("DELETE")
 	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
 	// r.HandleFunc("/reviews/{reviewid}", UpdateReviewEndPoint).Methods("PUT")
 	
