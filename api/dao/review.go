@@ -10,6 +10,7 @@ import (
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+
 	"github.com/marsDev31/kuclap-backend/api/models"
 )
 
@@ -63,19 +64,25 @@ func (m *SessionDAO) UpdateReportById(id string, updateAt time.Time) error {
 }
 
 // Update stats on class by class_id 
-func (m *SessionDAO) UpdateStatsClass(classId string, newStats models.StatClass) error {
+func (m *SessionDAO) UpdateStatsClassByCreated(classId string, newStats models.StatClass) error {
 	err := db.C(CCLASSES).Update(bson.M{"class_id": classId}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": 1}})
 	return err
 }
 
+// Update stats on class by class_id 
+func (m *SessionDAO) UpdateStatsClassByDeleted(classId string, newStats models.StatClass) error {
+	err := db.C(CCLASSES).Update(bson.M{"class_id": classId}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": -1}})
+	return err
+}
+
 // Update number of review
-func (m *SessionDAO) UpdateNuberReviewByClassId(classId string, updateAt time.Time) error {
+func (m *SessionDAO) UpdateNuberReviewByClassID(classId string, updateAt time.Time) error {
 	err := db.C(CCLASSES).Update(bson.M{"class_id": classId}, bson.M{"$inc": bson.M{"number_reviewer": 1}})
 	return err
 }
 
 // Find class by class_id
-func (m *SessionDAO) FindClassByClassId(classId string) (models.Class, error) {
+func (m *SessionDAO) FindClassByClassID(classId string) (models.Class, error) {
 	var class models.Class
 	err := db.C(CCLASSES).Find(bson.M{"class_id": classId}).One(&class)
 	return class, err
@@ -95,7 +102,7 @@ func (m *SessionDAO) InsertClass(class models.Class) error {
 }
 
 // Find reviews by class_id
-func (m *SessionDAO) FindReviewsByClassId(classId string, page string, offset string) ([]models.RReview, error) {
+func (m *SessionDAO) FindReviewsByClassID(classId string, page string, offset string) ([]models.RReview, error) {
 	var reviews []models.RReview
 	iPage, err := strconv.Atoi(page)
 	iOffset, err := strconv.Atoi(offset)

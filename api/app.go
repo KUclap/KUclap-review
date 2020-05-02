@@ -26,14 +26,19 @@ var limiter = middleware.NewIPRateLimiter(200, 10)
 var mcf = config.Config{}
 var mdao = dao.SessionDAO{}
 
-func getNewStats(oldN float64, oldstat float64, newStats float64) float64 {
+func getNewStatsByCreated(oldN float64, oldstat float64, newStats float64) float64 {
 	return ((newStats / 5 * 100) + (oldstat * oldN)) / (oldN + 1)
 }
 
+
+func getNewStatsByDeleted(oldN float64, oldstat float64, newStats float64) float64 {
+	return ((oldstat * oldN) - (newStats / 5 * 100) ) / (oldN - 1)
+}
+
 // GET class by class_id
-func FindClassByClassIdEndpoint(w http.ResponseWriter, r *http.Request) {
+func FindClassByClassIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	class, err := mdao.FindClassByClassId(params["classid"])
+	class, err := mdao.FindClassByClassID(params["classid"])
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -90,19 +95,19 @@ func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	class, err := mdao.FindClassByClassId(params["classid"])
+	class, err := mdao.FindClassByClassID(params["classid"])
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	// Process new stats
 	var oldStats = class.Stats
-	newStats.How = getNewStats(class.NumberReviewer, oldStats.How, newStats.How)
-	newStats.Homework = getNewStats(class.NumberReviewer, oldStats.Homework, newStats.Homework)
-	newStats.Interest = getNewStats(class.NumberReviewer, oldStats.Interest, newStats.Interest)
+	newStats.How = getNewStatsByCreated(class.NumberReviewer, oldStats.How, newStats.How)
+	newStats.Homework = getNewStatsByCreated(class.NumberReviewer, oldStats.Homework, newStats.Homework)
+	newStats.Interest = getNewStatsByCreated(class.NumberReviewer, oldStats.Interest, newStats.Interest)
 	newStats.UpdateAt = time.Now().UTC() 
 	
-	if err = mdao.UpdateStatsClass(params["classid"], newStats); err != nil {
+	if err = mdao.UpdateStatsClassByCreated(params["classid"], newStats); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -135,11 +140,11 @@ func InsertClassEndpoint(w http.ResponseWriter, r * http.Request){
 }
 
 // GET list of reviews by class_id
-func AllReviewsByClassIdEndPoint(w http.ResponseWriter, r *http.Request) {
+func AllReviewsByClassIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	page := r.URL.Query().Get("page")
 	offset := r.URL.Query().Get("offset")
-	reviews, err := mdao.FindReviewsByClassId(params["classid"], page, offset)
+	reviews, err := mdao.FindReviewsByClassID(params["classid"], page, offset)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review classid")
 		return
@@ -147,7 +152,8 @@ func AllReviewsByClassIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, reviews)
 }
 
-// GET list of reviews // Read param on UrlQuery (eg. /last?offset=5 )
+// GET list of reviews 
+// Read param on UrlQuery (eg. /last?offset=5 )
 // Paging by query: page={number_page} offset={number_offset}
 func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 	page := r.URL.Query().Get("page")
@@ -173,6 +179,7 @@ func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 // POST a new review
 func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+	var class models.Class	
 	var review models.Review
 
 	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
@@ -180,7 +187,25 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	review.CreatedAt = time.Now().UTC() // Parse UTC to GTM+7 Thailand's timezone.
+	class, err := mdao.FindClassByClassID(review.ClassID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	
+	var oldStats = class.Stats
+	var newStats models.StatClass
+	newStats.How = getNewStatsByCreated(class.NumberReviewer, oldStats.How, review.Stats.How)
+	newStats.Homework = getNewStatsByCreated(class.NumberReviewer, oldStats.Homework, review.Stats.Homework)
+	newStats.Interest = getNewStatsByCreated(class.NumberReviewer, oldStats.Interest, review.Stats.Interest)
+	newStats.UpdateAt = time.Now().UTC() 
+	
+	if err = mdao.UpdateStatsClassByCreated(review.ClassID, newStats); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	review.CreatedAt = time.Now().UTC() 
 	review.UpdateAt = review.CreatedAt
 	review.ID = bson.NewObjectId()
 
@@ -208,10 +233,28 @@ func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	reqToken := r.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, " ")
 	reqAuth := splitToken[1]
+	var class models.Class
 	
 	review, err := mdao.FindById(params["reviewid"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
+		return
+	}
+	
+	class, err = mdao.FindClassByClassID(review.ClassID)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	var newStats models.StatClass
+	var oldStats = class.Stats
+	newStats.How = getNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
+	newStats.Homework = getNewStatsByDeleted(class.NumberReviewer, oldStats.Homework,  review.Stats.Homework)
+	newStats.Interest = getNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
+	newStats.UpdateAt = time.Now().UTC() 
+
+	if err = mdao.UpdateStatsClassByDeleted(review.ClassID, newStats); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -241,20 +284,21 @@ func init() {
 func main() {
 	
 	port := goDotEnvVariable("PORT")
+	origin := goDotEnvVariable("ORIGIN_ALLOWED")
 	fmt.Println("Starting services.")
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Origin", "Authorization", "Content-Type"})
 	exposeOk := handlers.ExposedHeaders([]string{""})
-	originsOk := handlers.AllowedOrigins([]string{"*"})
+	originsOk := handlers.AllowedOrigins([]string{origin})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 	r := mux.NewRouter()
 	r.HandleFunc("/", Root).Methods("GET")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
 	r.HandleFunc("/class", InsertClassEndpoint).Methods("POST")
-	r.HandleFunc("/class/{classid}", FindClassByClassIdEndpoint).Methods("GET")
+	r.HandleFunc("/class/{classid}", FindClassByClassIDEndpoint).Methods("GET")
 	r.HandleFunc("/class/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews/last", LastReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/review", CreateReviewEndPoint).Methods("POST")
-	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIdEndPoint).Methods("GET")
+	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIDEndPoint).Methods("GET")
 	r.HandleFunc("/review/{reviewid}", FindReviewEndpoint).Methods("GET")
 	r.HandleFunc("/review/report/{reviewid}", UpdateReportByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/review/clap/{reviewid}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")

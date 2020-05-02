@@ -2,7 +2,7 @@ package models
 import "time"
 
 type Class struct {
-	ClassId			string			`json:"classId" bson:"class_id"`
+	ClassID			string			`json:"classId" bson:"class_id"`
 	NameTh			string			`json:"nameTh" bson:"name_th"`
 	NameEn			string			`json:"nameEn" bson:"name_en"`
 	Label			string			`json:"label" bson:"label"`
