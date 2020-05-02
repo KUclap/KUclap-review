@@ -246,11 +246,20 @@ func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	var newStats models.StatClass
 	var oldStats = class.Stats
-	newStats.How = getNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
-	newStats.Homework = getNewStatsByDeleted(class.NumberReviewer, oldStats.Homework,  review.Stats.Homework)
-	newStats.Interest = getNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
+	if class.NumberReviewer ==  0 {
+		// Ignore NaN when we divide with zero
+		newStats.How = 0
+		newStats.Homework = 0
+		newStats.Interest = 0
+	} else {
+		newStats.How = getNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
+		newStats.Homework = getNewStatsByDeleted(class.NumberReviewer, oldStats.Homework,  review.Stats.Homework)
+		newStats.Interest = getNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
+	}
+	
 	newStats.UpdateAt = time.Now().UTC() 
 
 	if err = mdao.UpdateStatsClassByDeleted(review.ClassID, newStats); err != nil {
@@ -339,7 +348,7 @@ func respondWithError(w http.ResponseWriter, code int, msg string) {
 }
 
 func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(payload)
+	response, err := json.Marshal(payload)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
