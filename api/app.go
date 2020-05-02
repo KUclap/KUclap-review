@@ -249,7 +249,7 @@ func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	var newStats models.StatClass
 	var oldStats = class.Stats
-	if class.NumberReviewer ==  0 {
+	if class.NumberReviewer ==  1 {
 		// Ignore NaN when we divide with zero
 		newStats.How = 0
 		newStats.Homework = 0
