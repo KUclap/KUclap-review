@@ -16,6 +16,8 @@ type Review struct {
 	Clap		uint64			`json:"clap" bson:"clap"`
 	Boo			uint64			`json:"boo" bson:"boo"`
 	Stats		StatReview		`json:"stats" bson:"stats"`	
+	ClassNameTH	string			`json:"classNameTH" bson:"class_name_th"`
+	ClassNameEN	string			`json:"classNameEN" bson:"class_name_en"`
 	CreatedAt	time.Time		`json:"createdAt" bson:"created_at"`
 	UpdateAt	time.Time		`json:"updateAt" bson:"update_at"`
 	Reported	bool			`json:"reported" bson:"reported"`
@@ -27,7 +29,7 @@ type StatReview struct {
 	Interest	float64		`json:"interest" bson:"interest"`
 }
 
-type RReview struct {
+type ResReview struct {
 	ID			bson.ObjectId	`json:"reviewId" bson:"_id"`
 	ClassID		string			`json:"classId" bson:"class_id"`
 	Text		string			`json:"text" bson:"text"`
@@ -35,6 +37,8 @@ type RReview struct {
 	Grade		string			`json:"grade" bson:"grade"`
 	Clap		uint64			`json:"clap" bson:"clap"`
 	Boo			uint64			`json:"boo" bson:"boo"`
+	ClassNameTH	string			`json:"classNameTH" bson:"class_name_th"`
+	ClassNameEN	string			`json:"classNameEN" bson:"class_name_en"`
 	CreatedAt	time.Time		`json:"createdAt" bson:"created_at"`
 	UpdateAt	time.Time		`json:"updateAt" bson:"update_at"`
 	Reported	bool			`json:"reported" bson:"reported"`

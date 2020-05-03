@@ -3,8 +3,8 @@ import "time"
 
 type Class struct {
 	ClassID			string			`json:"classId" bson:"class_id"`
-	NameTh			string			`json:"nameTh" bson:"name_th"`
-	NameEn			string			`json:"nameEn" bson:"name_en"`
+	NameTH			string			`json:"nameTh" bson:"name_th"`
+	NameEN			string			`json:"nameEn" bson:"name_en"`
 	Label			string			`json:"label" bson:"label"`
 	Hours			string			`json:"hours" bson:"hours"`
 	Unit			uint64			`json:"unit" bson:"unit"`

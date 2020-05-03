@@ -199,12 +199,14 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	newStats.Homework = getNewStatsByCreated(class.NumberReviewer, oldStats.Homework, review.Stats.Homework)
 	newStats.Interest = getNewStatsByCreated(class.NumberReviewer, oldStats.Interest, review.Stats.Interest)
 	newStats.UpdateAt = time.Now().UTC() 
-	
+
 	if err = mdao.UpdateStatsClassByCreated(review.ClassID, newStats); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	
+	review.ClassNameTH = class.NameTH
+	review.ClassNameEN = class.NameEN
 	review.CreatedAt = time.Now().UTC() 
 	review.UpdateAt = review.CreatedAt
 	review.ID = bson.NewObjectId()
