@@ -49,7 +49,7 @@ func FindClassByClassIDEndpoint(w http.ResponseWriter, r *http.Request) {
 // PUT update clap by id
 func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	updateAt := time.Now().UTC()
+	updateAt := time.Now().UTC().Add(7*time.Hour)
 	iclap, _ := strconv.ParseUint(params["clap"],10 ,32)
 	if err := mdao.UpdateClapById(params["reviewid"], iclap, updateAt); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -61,7 +61,7 @@ func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 // PUT update boo by id
 func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	updateAt := time.Now().UTC()
+	updateAt := time.Now().UTC().Add(7*time.Hour)
 	iboo, _ := strconv.ParseUint(params["boo"],10, 32)
 	if err := mdao.UpdateBooById(params["reviewid"], iboo, updateAt); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -74,7 +74,7 @@ func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 func UpdateReportByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
-	updateAt := time.Now().UTC()
+	updateAt := time.Now().UTC().Add(7*time.Hour)
 
 	if err := mdao.UpdateReportById(params["reviewid"], updateAt); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid review id")
@@ -105,7 +105,7 @@ func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 	newStats.How = getNewStatsByCreated(class.NumberReviewer, oldStats.How, newStats.How)
 	newStats.Homework = getNewStatsByCreated(class.NumberReviewer, oldStats.Homework, newStats.Homework)
 	newStats.Interest = getNewStatsByCreated(class.NumberReviewer, oldStats.Interest, newStats.Interest)
-	newStats.UpdateAt = time.Now().UTC() 
+	newStats.UpdateAt = time.Now().UTC().Add(7*time.Hour) 
 	
 	if err = mdao.UpdateStatsClassByCreated(params["classid"], newStats); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -198,16 +198,16 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	newStats.How = getNewStatsByCreated(class.NumberReviewer, oldStats.How, review.Stats.How)
 	newStats.Homework = getNewStatsByCreated(class.NumberReviewer, oldStats.Homework, review.Stats.Homework)
 	newStats.Interest = getNewStatsByCreated(class.NumberReviewer, oldStats.Interest, review.Stats.Interest)
-	newStats.UpdateAt = time.Now().UTC() 
+	newStats.UpdateAt = time.Now().UTC().Add(7*time.Hour) 
 
 	if err = mdao.UpdateStatsClassByCreated(review.ClassID, newStats); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	
+
 	review.ClassNameTH = class.NameTH
 	review.ClassNameEN = class.NameEN
-	review.CreatedAt = time.Now().UTC() 
+	review.CreatedAt = time.Now().UTC().Add(7*time.Hour) 
 	review.UpdateAt = review.CreatedAt
 	review.ID = bson.NewObjectId()
 
@@ -262,7 +262,7 @@ func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 		newStats.Interest = getNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
 	}
 	
-	newStats.UpdateAt = time.Now().UTC() 
+	newStats.UpdateAt = time.Now().UTC().Add(7*time.Hour) 
 
 	if err = mdao.UpdateStatsClassByDeleted(review.ClassID, newStats); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -414,7 +414,7 @@ func initialClasses(){
 // 	params := mux.Vars(r)
 // 	var review models.Review
 
-// 	review.UpdateAt = time.Now().UTC()
+// 	review.UpdateAt = time.Now().UTC().Add(7*time.Hour)
 // 	review.ID = bson.ObjectIdHex(params["reviewid"])
 
 // 	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
