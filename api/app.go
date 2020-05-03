@@ -32,11 +32,11 @@ func getNewStatsByCreated(oldN float64, oldstat float64, newStats float64) float
 
 
 func getNewStatsByDeleted(oldN float64, oldstat float64, newStats float64) float64 {
-	if oldN - 1 == 0 {
-		return 0
-	} else {
+	if oldN - 1 <= 0 {
+		return oldstat
+	} 
 		return ((oldstat * oldN) - (newStats / 5 * 100) ) / (oldN - 1)
-	}
+	
 }
 
 // GET class by class_id
@@ -401,33 +401,3 @@ func initialClasses(){
 		insetClasstoDatabase(class)
 	}
 }
-
-// GET class by class_id
-// func FindReviewReportedEndpoint(w http.ResponseWriter, r *http.Request) {
-// 	reviews, err := mdao.FindReviewsReported()
-// 	if err != nil {
-// 		respondWithError(w, http.StatusInternalServerError, err.Error())
-// 		return
-// 	}
-// 	respondWithJson(w, http.StatusOK, reviews)
-// }
-
-// PUT update an existing review
-// func UpdateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
-// 	defer r.Body.Close()
-// 	params := mux.Vars(r)
-// 	var review models.Review
-
-// 	review.UpdateAt = time.Now().UTC().Add(7*time.Hour)
-// 	review.ID = bson.ObjectIdHex(params["reviewid"])
-
-// 	if err := json.NewDecoder(r.Body).Decode(&review); err != nil {
-// 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-// 		return
-// 	}
-// 	if err := mdao.Update(review); err != nil {
-// 		respondWithError(w, http.StatusInternalServerError, err.Error())
-// 		return
-// 	}
-// 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
-// }
