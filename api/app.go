@@ -32,7 +32,11 @@ func getNewStatsByCreated(oldN float64, oldstat float64, newStats float64) float
 
 
 func getNewStatsByDeleted(oldN float64, oldstat float64, newStats float64) float64 {
-	return ((oldstat * oldN) - (newStats / 5 * 100) ) / (oldN - 1)
+	if oldN - 1 == 0 {
+		return 0
+	} else {
+		return ((oldstat * oldN) - (newStats / 5 * 100) ) / (oldN - 1)
+	}
 }
 
 // GET class by class_id
