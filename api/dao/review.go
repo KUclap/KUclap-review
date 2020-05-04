@@ -24,6 +24,7 @@ var db *mgo.Database
 const (
 	CREVIEWS = "reviews"
 	CCLASSES = "classes"
+	CREPORTS = "reported"
 )
 
 // Establish a connection to database
@@ -43,6 +44,12 @@ func (m *SessionDAO) Connect() {
 	}
 	db = session.DB(m.Database)
 	fmt.Println("CONNECTED: got session.")
+}
+
+// Insert report to database
+func (m *SessionDAO) InsertReport(report models.Report) error {
+	err := db.C(CREPORTS).Insert(&report)
+	return err	
 }
 
 // Update clap by id

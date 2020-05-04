@@ -26,6 +26,7 @@ var limiter = middleware.NewIPRateLimiter(200, 10)
 var mcf = config.Config{}
 var mdao = dao.SessionDAO{}
 
+
 func getNewStatsByCreated(oldN float64, oldstat float64, newStats float64) float64 {
 	return ((newStats / 5 * 100) + (oldstat * oldN)) / (oldN + 1)
 }
@@ -86,6 +87,31 @@ func UpdateReportByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusOK,  map[string]string{"result": "success"})
 }
+
+func CreateReportEndPoint(w http.ResponseWriter, r *http.Request) { 
+	defer r.Body.Close()
+	var report models.Report
+
+	if err := json.NewDecoder(r.Body).Decode(&report); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	updateAt := time.Now().UTC().Add(7*time.Hour)
+	if err := mdao.UpdateReportById(report.ReviewID, updateAt); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid review id")
+		return
+	}
+
+	report.CreatedAt = time.Now().UTC().Add(7*time.Hour)
+	if err := mdao.InsertReport(report); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJson(w, http.StatusCreated, report)
+}
+
 
 // PUT stats by class_id
 func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -320,6 +346,7 @@ func main() {
 	r.HandleFunc("/review/boo/{reviewid}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/review/{reviewid}", DeleteReviewByIdEndPoint).Methods("DELETE")
+	r.HandleFunc("/report", CreateReportEndPoint).Methods("POST")
 	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
 	// r.HandleFunc("/reviews/{reviewid}", UpdateReviewEndPoint).Methods("PUT")
 	
