@@ -27,3 +27,6 @@ heroku-container-release-web:
 
 cp-cr:
 	heroku container:push ${DYNO} --app ${APP} && heroku container:release ${DYNO} --app ${APP}
+
+load-testing-vegeta:
+	vegeta attack -duration=10s -rate=100 -targets=vegeta.conf | vegeta report
