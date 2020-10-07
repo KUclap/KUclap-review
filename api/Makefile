@@ -1,4 +1,4 @@
-pkg = github.com/marsDev31/kuclap-backend/api
+pkg = github.com/KUclap/KUclap-review/api
 APP_PROD = kuclap-api
 APP_STAGING = kuclap-api-staging
 DYNO = web

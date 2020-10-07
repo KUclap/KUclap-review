@@ -16,10 +16,10 @@ import (
 	"github.com/gorilla/mux"
     "github.com/gorilla/handlers"
 
-    "github.com/marsDev31/kuclap-backend/api/config"
-	"github.com/marsDev31/kuclap-backend/api/middleware"
-	"github.com/marsDev31/kuclap-backend/api/dao"
-	"github.com/marsDev31/kuclap-backend/api/models"
+    "github.com/KUclap/KUclap-review/api/config"
+	"github.com/KUclap/KUclap-review/api/middleware"
+	"github.com/KUclap/KUclap-review/api/dao"
+	"github.com/KUclap/KUclap-review/api/models"
 )
 
 var limiter = middleware.NewIPRateLimiter(200, 10)
@@ -373,7 +373,7 @@ func limitMiddleware(next http.Handler) http.Handler {
 
 // ROOT request
 func Root(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/marsDev31/kuclap-backend.")
+	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/KUclap/KUclap-review.")
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {

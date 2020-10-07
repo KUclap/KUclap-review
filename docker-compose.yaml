@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   api:
-    env_file: : ./api/.env
+    env_file: ./api/.env
     container_name: "api-kuclap"
     build: "./api"
     ports:

@@ -6,7 +6,7 @@ import (
 	"time"
 	"strings"
 	"io/ioutil"
-	 "github.com/marsDev31/kuclap-backend/api/models"
+	 "github.com/KUclap/KUclap-review/api/models"
 	// "../models"
 )
 
