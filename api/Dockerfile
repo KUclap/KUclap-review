@@ -8,5 +8,6 @@ COPY . .
 
 RUN go get github.com/pilu/fresh
 RUN go get ./...
+RUN ls -al 
 
 CMD [ "fresh" ]
