@@ -315,7 +315,7 @@ func init() {
 	fmt.Println("Initial service..")
 	// Conection on database
 	mcf.Read()
-	mdao.Server = goDotEnvVariable("SERVER")
+	mdao.Server = goDotEnvVariable("DB_SERVER")
 	mdao.Database = mcf.Database
 	mdao.Connect() 
 	// initialClasses()
