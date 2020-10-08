@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Web Preact - Publish to Github Packages Registry
+      - name: Review api - Publish to Github Packages Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         env:
           DB_SERVER: ${{ secrets.ENV_DB_SERVER }}
