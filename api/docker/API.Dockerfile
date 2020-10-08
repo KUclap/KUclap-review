@@ -6,7 +6,8 @@ ARG PORT
 
 COPY . /go/src/github.com/KUclap/KUclap-review/api
 WORKDIR /go/src/github.com/KUclap/KUclap-review/api
-
+RUN pwd
+RUN ls -al
 RUN printf "DB_SERVER=$DB_SERVER\nORIGIN_ALLOWED=$ORIGIN_ALLOWED\nPORT=$PORT\n" > .env
 RUN echo $GOPATH
 RUN go get ./...
