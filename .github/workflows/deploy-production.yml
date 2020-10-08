@@ -13,17 +13,17 @@ jobs:
       - name: Web Preact - Publish to Github Packages Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         env:
-          URL_API: ${{ secrets.ENV_URL_API }}
-          SERVER_PORT: ${{ secrets.ENV_SERVER_PORT }}
-          SSR: ${{ secrets.ENV_SSR }}
+          DB_SERVER: ${{ secrets.ENV_DB_SERVER }}
+          ORIGIN_ALLOWED: ${{ secrets.ENV_ORIGIN_ALLOWED }}
+          PORT: ${{ secrets.ENV_PORT }}
         with:
-          name: kuclap/kuclap/kuclap-web
+          name: kuclap/kuclap-review/kuclap-review-api
           registry: docker.pkg.github.com
           username: ${{ secrets.GIT_USERNAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          dockerfile: ./docker/Web.Dockerfile
+          dockerfile: ./docker/API.Dockerfile
           tags: "1.0.0, latest"
-          buildargs: URL_API,SERVER_PORT,SSR
+          buildargs: DB_SERVER,ORIGIN_ALLOWED,PORT
       - name: Deploy package to digitalocean
         uses: appleboy/ssh-action@master
         env:
@@ -36,9 +36,9 @@ jobs:
           port: ${{ secrets.DO_GANDALF_PORT }}
           envs: GIT_USERNAME, GITHUB_TOKEN
           script: |
-            docker stop kuclap-web
+            docker stop kuclap-review-api
             docker container prune -f 
             docker image prune -f
             docker login docker.pkg.github.com -u $GIT_USERNAME -p $GITHUB_TOKEN
-            docker pull docker.pkg.github.com/kuclap/kuclap/kuclap-web:latest
-            docker run --name kuclap-web --network=kuclap --restart=always  -dit -p 8000:8000 docker.pkg.github.com/kuclap/kuclap/kuclap-web:latest
+            docker pull docker.pkg.github.com/kuclap/kuclap-review/kuclap-review-api:latest
+            docker run --name kuclap-review-api --network=kuclap --restart=always  -dit -p 8000:8000 docker.pkg.github.com/kuclap/kuclap-review/kuclap-review-api:latest
