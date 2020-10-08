@@ -44,3 +44,9 @@ duplicate-collection-to-another-db:
 	### shell to mongo cluster
 	use src_db
 	db.src_collection.find().forEach(function(d){ db.getSiblingDB('dest_db')['dest_collection'].insert(d); });
+
+### Build docker container
+build-docker:
+	docker build -f ./docker/API.Dockerfile
+
+### Deploy to production (Digital Ocean)
