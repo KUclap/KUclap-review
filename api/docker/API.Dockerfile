@@ -4,7 +4,7 @@ ARG DB_SERVER
 ARG ORIGIN_ALLOWED
 ARG PORT
 
-COPY . /go/src/github.com/KUclap/KUclap-review/api
+COPY . /go/src/github.com/KUclap/KUclap-review
 WORKDIR /go/src/github.com/KUclap/KUclap-review/api
 RUN pwd
 RUN ls -al
