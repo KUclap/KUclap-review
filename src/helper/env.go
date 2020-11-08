@@ -8,7 +8,7 @@ import (
 )
 
 //  Getter environment from .env.
-func goDotEnvVariable(key string) string {
+func GetENV(key string) string {
 	// load .env file
 	err := godotenv.Load(".env")
 	if err != nil {
