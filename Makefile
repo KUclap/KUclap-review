@@ -50,6 +50,6 @@ duplicate-collection-to-another-db:
 
 ### Build docker container
 build-docker:
-	docker build -f ./docker/API.Dockerfile
+	docker build -f ./docker/API.Dockerfile -t kuclap-review-api-v2
 
 ### Deploy to production (Digital Ocean)
