@@ -310,6 +310,11 @@ func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ROOT request
+func Root(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "https://github.com/kuclap 😎")
+}
+
 // Parse the server_configuration file 'server_config.toml', and establish a connection to DB
 func init() {
 	log.Println("Initial service... 🔧")
@@ -373,11 +378,6 @@ func limitMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// ROOT request
-func Root(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hi Developers!, Welcome to KUclap services: PRs welcome @https://github.com/KUclap/KUclap-review.")
-}
-
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
 }
@@ -389,14 +389,14 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-// func getRemoteAddr(r *http.Request) string {
-// 	forwarded := r.Header.Get("X-FORWARDED-FOR")
-// 	if forwarded != "" {
-// 		log.Println(forwarded)
-// 		return forwarded
-// 	}
-// 	return r.RemoteAddr
-// }
+func getRemoteAddr(r *http.Request) string {
+	forwarded := r.Header.Get("X-FORWARDED-FOR")
+	if forwarded != "" {
+		log.Println(forwarded)
+		return forwarded
+	}
+	return r.RemoteAddr
+}
 
 //  Getter environment from .env.
 func goDotEnvVariable(key string) string {

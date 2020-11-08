@@ -11,7 +11,7 @@ deploy-to-staging: cp-cr-staging
 
 ### Development (PRODUCTION)
 go-run:
-	go run ./src/server.go
+	modd -f ./config/modd.conf 
 
 go-get:
 	go get -u ${pkg}

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"io/ioutil"
 
-	"github.com/KUclap/KUclap-review/api/models"
+	"github.com/KUclap/KUclap-review/src/models"
 )
 
 
