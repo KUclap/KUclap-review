@@ -30,6 +30,15 @@ func LimitMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// func getRemoteAddr(r *http.Request) string {
+// 	forwarded := r.Header.Get("X-FORWARDED-FOR")
+// 	if forwarded != "" {
+// 		log.Println(forwarded)
+// 		return forwarded
+// 	}
+// 	return r.RemoteAddr
+// }
+
 // NewIPRateLimiter .
 func NewIPRateLimiter(r rate.Limit, b int) *IPRateLimiter {
 	i := &IPRateLimiter{

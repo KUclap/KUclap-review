@@ -12,7 +12,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-
 const (
 	COLLECTION_REVIEWS = "reviews"
 	COLLECTION_CLASSES = "classes"
@@ -47,7 +46,6 @@ func (m *SessionDAO) Connect() {
 
 // Insert report to database
 func (m *SessionDAO) InsertReport(report models.Report) error {
-	
 	err := db.C(COLLECTION_REPORTS).Insert(&report)
 	return err	
 }
