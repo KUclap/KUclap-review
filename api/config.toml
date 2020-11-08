@@ -1,3 +1,0 @@
-server="mongo:27017"
-database="ku-clap"
-database-staging="ku-clap"
