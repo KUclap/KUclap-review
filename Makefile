@@ -40,7 +40,7 @@ cp-cr-staging:
 
 ### Load Testing 
 load-testing-vegeta:
-	vegeta attack -duration=10s -rate=100 -targets=vegeta.conf | vegeta report
+	vegeta attack -duration=1s -rate=1000 -targets=./config/vegeta.conf | vegeta report
 
 ### MongoDB 
 duplicate-collection-to-another-db:

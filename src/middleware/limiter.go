@@ -15,7 +15,7 @@ type IPRateLimiter struct {
 	b   int
 }
 
-var limiter = NewIPRateLimiter(200, 10)
+var limiter = NewIPRateLimiter(350, 10)
 
 // Rate Limit base on IP (r = tokens per second, b = maximum burst size of b events)
 func LimitMiddleware(next http.Handler) http.Handler {
