@@ -9,10 +9,9 @@ RUN curl -H 'Authorization: token ${GITHUB_TOKEN}' -o config.toml https://raw.gi
 RUN ls -al 
 RUN cat config.toml
 RUN mv config.toml ./config/config.toml
+RUN mkdir builder
 RUN go get ./...
 RUN go build -o ./builder/kuclap-review-api .
-# RUN go build 
-# RUN go get github.com/pilu/fresh
 
 CMD ["KIND=production ./builder/kuclap-review-api"]
 EXPOSE 8000
