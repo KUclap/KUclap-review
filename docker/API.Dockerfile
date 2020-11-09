@@ -12,7 +12,7 @@ RUN mkdir builder
 RUN go get ./...
 RUN go build -o ./builder/kuclap-review-api .
 RUN ls -al ./builder
-RUN ls -al
+RUN ls -al ./config
 
 CMD ["./builder/kuclap-review-api"]
 EXPOSE 8000
