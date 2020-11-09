@@ -7,7 +7,7 @@ import (
 )
 
 type application struct {
-	Port int
+	Port string
 	ORIGIN_ALLOWED string
 }
 

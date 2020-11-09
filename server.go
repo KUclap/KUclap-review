@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"fmt"
-	"kuclap-review-api/src/helper"
     "kuclap-review-api/src/config"
 	"kuclap-review-api/src/middleware"
 	"kuclap-review-api/src/routes"
@@ -15,8 +14,10 @@ import (
     "github.com/gorilla/handlers"
 )
 
-var kind string 
+
+var serverConfig = config.Config{}
 var mgoDAO = dao.SessionDAO{}
+var kind string
 
 // ROOT request
 func Healthcheck(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +27,7 @@ func Healthcheck(w http.ResponseWriter, r *http.Request) {
 // Parse the serverConfiguration file 'serverConfig.toml', and establish a connection to DB
 func init() {
 	log.Println("Initial service... 🔧") 
-	serverConfig := config.Config{}
+	
 	serverConfig.Read()
 	
 	if os.Getenv("KIND") == "development" {
@@ -39,7 +40,6 @@ func init() {
 		mgoDAO.Database = serverConfig.Production.Database
 	}
 
-	// mgoDAO.Server = helper.GetENV("DB_SERVER")
 	mgoDAO.Connect()
 	// initialClasses()
 }
@@ -47,8 +47,8 @@ func init() {
 // Define HTTP request routes
 func main() {
 	log.Println("Starting server... 🤤")
-	port := helper.GetENV("PORT")
-	origin := helper.GetENV("ORIGIN_ALLOWED")
+	port := serverConfig.Application.Port
+	origin := serverConfig.Application.ORIGIN_ALLOWED
 	
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Origin", "Authorization", "Content-Type"})
 	exposeOk := handlers.ExposedHeaders([]string{""})
@@ -64,6 +64,5 @@ func main() {
 	log.Println("Server listening on port " + port + " 🚀")
 	if err := http.ListenAndServe(":" + port, middleware.LimitMiddleware(handlers.CORS(headersOk, exposeOk, originsOk, methodsOk)(r))); err != nil {
 		log.Fatal(err)
-	}
-	
+	}	
 }

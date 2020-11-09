@@ -14,5 +14,5 @@ RUN go build -o ./builder/kuclap-review-api .
 # RUN go build 
 # RUN go get github.com/pilu/fresh
 
-CMD ["./builder/kuclap-review-api"]
+CMD ["KIND=production ./builder/kuclap-review-api"]
 EXPOSE 8000
