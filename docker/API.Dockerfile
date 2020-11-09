@@ -10,8 +10,9 @@ WORKDIR /go/src/github.com/KUclap/KUclap-review
 RUN printf "DB_SERVER=$DB_SERVER\nORIGIN_ALLOWED=$ORIGIN_ALLOWED\nPORT=$PORT\n" > .env
 
 RUN go get ./...
-RUN go build 
-RUN go get github.com/pilu/fresh
+RUN go build -o ./builder/kuclap-review-api .
+# RUN go build 
+# RUN go get github.com/pilu/fresh
 
-CMD ["fresh"]
+CMD ["./builder/kuclap-review-api"]
 EXPOSE 8000

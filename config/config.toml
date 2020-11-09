@@ -1,3 +1,13 @@
-server="mongo:27017"
-database="ku-clap"
-database-staging="ku-clap"
+[ Application ]
+Port = 8000
+ORIGIN_ALLOWED = "https://www.kuclap.com"
+
+[ Production ]
+Kind = "Production"
+Server = "mongodb://kuclap:kuclap@cluster0-shard-00-00-no3rr.gcp.mongodb.net:27017,cluster0-shard-00-01-no3rr.gcp.mongodb.net:27017,cluster0-shard-00-02-no3rr.gcp.mongodb.net:27017/kuclap?replicaSet=Cluster0-shard-0&authSource=admin"
+Database = "ku-clap"
+
+[ Development ]
+Kind = "Development"
+Server = "mongodb://kuclap:kuclap@cluster0-shard-00-00-no3rr.gcp.mongodb.net:27017,cluster0-shard-00-01-no3rr.gcp.mongodb.net:27017,cluster0-shard-00-02-no3rr.gcp.mongodb.net:27017/kuclap?replicaSet=Cluster0-shard-0&authSource=admin"
+Database = "staging-ku-clap"

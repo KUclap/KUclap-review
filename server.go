@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"log"
 	"net/http"
 	"fmt"
@@ -14,6 +15,7 @@ import (
     "github.com/gorilla/handlers"
 )
 
+var kind string 
 var mgoDAO = dao.SessionDAO{}
 
 // ROOT request
@@ -23,11 +25,21 @@ func Healthcheck(w http.ResponseWriter, r *http.Request) {
 
 // Parse the serverConfiguration file 'serverConfig.toml', and establish a connection to DB
 func init() {
-	log.Println("Initial service... 🔧")
+	log.Println("Initial service... 🔧") 
 	serverConfig := config.Config{}
 	serverConfig.Read()
-	mgoDAO.Database = serverConfig.Database
-	mgoDAO.Server = helper.GetENV("DB_SERVER")
+	
+	if os.Getenv("KIND") == "development" {
+		kind = serverConfig.Development.Kind
+		mgoDAO.Server = serverConfig.Development.Server
+		mgoDAO.Database = serverConfig.Development.Database
+	} else {
+		kind = serverConfig.Production.Kind
+		mgoDAO.Server = serverConfig.Production.Server
+		mgoDAO.Database = serverConfig.Production.Database
+	}
+
+	// mgoDAO.Server = helper.GetENV("DB_SERVER")
 	mgoDAO.Connect()
 	// initialClasses()
 }
@@ -48,7 +60,7 @@ func main() {
 	routes.IndexClassesHandler(r)
 	routes.IndexReviewHandler(r)
 	r.HandleFunc("/healthcheck", Healthcheck).Methods("GET")
-		
+	log.Println("Running on " + kind + " Mode 🌶")	
 	log.Println("Server listening on port " + port + " 🚀")
 	if err := http.ListenAndServe(":" + port, middleware.LimitMiddleware(handlers.CORS(headersOk, exposeOk, originsOk, methodsOk)(r))); err != nil {
 		log.Fatal(err)

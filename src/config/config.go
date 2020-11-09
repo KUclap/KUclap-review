@@ -6,10 +6,27 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// Represents database server and credentials
-type Config struct {
-	Server   string
+type application struct {
+	Port int
+	ORIGIN_ALLOWED string
+}
+
+type production struct {
+	Kind string
+	Server string
 	Database string
+}
+
+type development struct {
+	Kind string
+	Server string
+	Database string
+}
+
+type Config struct {
+	Application	application
+	Production	production
+	Development	development
 }
 
 // Read and parse the configuration file

@@ -1,4 +1,4 @@
-pkg = github.com/KUclap/KUclap-review/api
+pkg = github.com/KUclap/KUclap-review
 APP_PROD = kuclap-api
 APP_STAGING = kuclap-api-staging
 DYNO = web
@@ -10,7 +10,7 @@ deploy-to-prod: cp-cr-prod
 deploy-to-staging: cp-cr-staging
 
 ### Development (PRODUCTION)
-go-run:
+gomodd:
 	modd -f ./config/modd.conf 
 
 go-get:
