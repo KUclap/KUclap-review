@@ -16,6 +16,7 @@ jobs:
           DB_SERVER: ${{ secrets.ENV_DB_SERVER }}
           ORIGIN_ALLOWED: ${{ secrets.ENV_ORIGIN_ALLOWED }}
           PORT: ${{ secrets.ENV_PORT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           name: kuclap/kuclap-review/kuclap-review-api
           registry: docker.pkg.github.com
@@ -23,7 +24,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           dockerfile: ./docker/API.Dockerfile
           tags: "1.0.0, latest"
-          buildargs: DB_SERVER,ORIGIN_ALLOWED,PORT
+          buildargs: DB_SERVER,ORIGIN_ALLOWED,PORT,GITHUB_TOKEN
       - name: Deploy package to digitalocean
         uses: appleboy/ssh-action@master
         env:
