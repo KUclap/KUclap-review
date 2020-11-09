@@ -5,7 +5,7 @@ ARG GITHUB_TOKEN
 COPY . /go/src/github.com/KUclap/KUclap-review
 WORKDIR /go/src/github.com/KUclap/KUclap-review
 
-RUN curl -H 'Authorization: token ${GITHUB_TOKEN}' -o config.toml https://raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml
+RUN curl -H 'Authorization: token $GITHUB_TOKEN' -o config.toml https://raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml
 RUN mv config.toml ./config/config.toml && mkdir builder
 RUN go get ./...
 RUN go build -o ./builder/kuclap-review-api .
