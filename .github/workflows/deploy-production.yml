@@ -13,9 +13,6 @@ jobs:
       - name: Review API - Publish to Github Packages Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         env:
-          DB_SERVER: ${{ secrets.ENV_DB_SERVER }}
-          ORIGIN_ALLOWED: ${{ secrets.ENV_ORIGIN_ALLOWED }}
-          PORT: ${{ secrets.ENV_PORT }}
           GIT_ACCESS_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
         with:
           name: kuclap/kuclap-review/kuclap-review-api
@@ -24,7 +21,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           dockerfile: ./docker/API.Dockerfile
           tags: "1.0.0, latest"
-          buildargs: DB_SERVER,ORIGIN_ALLOWED,PORT,GIT_ACCESS_TOKEN
+          buildargs: GIT_ACCESS_TOKEN
       - name: Deploy package to digitalocean
         uses: appleboy/ssh-action@master
         env:
