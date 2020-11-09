@@ -14,7 +14,7 @@ RUN go build -o ./builder/kuclap-review-api .
 RUN ls -al ./builder
 RUN ls -al ./config
 
-CMD ["KIND=production ./builder/kuclap-review-api"]
+CMD ["make run-on-prod"]
 EXPOSE 8000
 
 # FROM golang:1.15

@@ -10,11 +10,15 @@ deploy-to-prod: cp-cr-prod
 deploy-to-staging: cp-cr-staging
 
 ### Development (PRODUCTION)
+
 gomodd:
 	modd -f ./config/modd.conf 
 
 go-get:
 	go get -u ${pkg}
+
+run-on-prod:
+	KIND=production ./builder/kuclap-review-api
 
 push-and-get-go:
 	git add . && git commit -m '[+] update : pkg on version control' && git push && go get -u ${pkg}

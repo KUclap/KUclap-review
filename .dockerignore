@@ -4,5 +4,4 @@
 .github
 docker-compose.yaml
 LICENSE
-Makefile
 README.md
