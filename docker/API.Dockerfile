@@ -1,11 +1,11 @@
 FROM golang:1.15
 
-ARG GIT_ACCESS_TOKEN
+ARG GIT_ACCESS_TOKEN_CURL_CONFIG
 
 COPY . /go/src/github.com/KUclap/KUclap-review
 WORKDIR /go/src/github.com/KUclap/KUclap-review
 
-RUN curl -H 'Authorization: token $GITHUB_TOKEN' -o config.toml https://raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml
+RUN curl -o config.toml https://raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml\?token\=$GIT_ACCESS_TOKEN_CURL_CONFIG
 RUN mv config.toml ./config/config.toml && mkdir builder
 RUN go get ./...
 RUN go build -o ./builder/kuclap-review-api .

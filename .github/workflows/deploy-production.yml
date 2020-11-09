@@ -13,7 +13,7 @@ jobs:
       - name: Review API - Publish to Github Packages Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         env:
-          GIT_ACCESS_TOKEN: ${{ secrets.GIT_ACCESS_TOKEN }}
+          GIT_ACCESS_TOKEN_CURL_CONFIG: ${{ secrets.GIT_ACCESS_TOKEN_CURL_CONFIG }}
         with:
           name: kuclap/kuclap-review/kuclap-review-api
           registry: docker.pkg.github.com
@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           dockerfile: ./docker/API.Dockerfile
           tags: "1.0.0, latest"
-          buildargs: GIT_ACCESS_TOKEN
+          buildargs: GIT_ACCESS_TOKEN_CURL_CONFIG
       - name: Deploy package to digitalocean
         uses: appleboy/ssh-action@master
         env:
