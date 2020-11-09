@@ -2,7 +2,6 @@
 /docker
 /source
 /src/utillitys
-/config
 .github
 docker-compose.yaml
 LICENSE
