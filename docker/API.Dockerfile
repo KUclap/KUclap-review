@@ -13,8 +13,9 @@ RUN go get ./...
 RUN go build -o ./builder/kuclap-review-api .
 RUN ls -al ./builder
 RUN ls -al ./config
-
-CMD ["make run-on-prod"]
+# ENV NODE_ENV=${DOCKER_ENV}
+ENV KIND=production 
+CMD ["./builder/kuclap-review-api"]
 EXPOSE 8000
 
 # FROM golang:1.15
