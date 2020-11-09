@@ -5,7 +5,7 @@ ARG GIT_ACCESS_TOKEN_CURL_CONFIG
 COPY . /go/src/github.com/KUclap/KUclap-review
 WORKDIR /go/src/github.com/KUclap/KUclap-review
 
-RUN curl -s -0 -o config.toml https://GIT_ACCESS_TOKEN_CURL_CONFIG@raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml
+RUN curl -o config.toml https://${GIT_ACCESS_TOKEN_CURL_CONFIG}@raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml
 RUN mv config.toml ./config/config.toml && mkdir builder
 RUN go get ./...
 RUN go build -o ./builder/kuclap-review-api .
