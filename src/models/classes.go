@@ -1,5 +1,9 @@
 package models
-import "time"
+import (
+	"time"
+
+	"gopkg.in/mgo.v2/bson"
+)
 
 // Class is model for create class
 type Class struct {
@@ -26,4 +30,25 @@ type StatClass struct {
 type OldClass struct {
 	Value	string	`json:"value"`
 	Label	string	`json:"label"`
+}
+
+// GetBSON is function for filling default value when save value on mongo
+func (class *Class) GetBSON() (interface{}, error) {
+    if class.Category == "" {
+		class.Category = "ยังไม่มีข้อมูล" 
+    }
+    type my *Class
+    return my(class), nil
+}
+
+// SetBSON is function for filling default value when load value from mongo
+func (class *Class) SetBSON(raw bson.Raw) (err error) {
+	type my Class
+    if err = raw.Unmarshal((*my)(class)); err != nil {
+        return
+	}
+	if class.Category == "" {
+		class.Category = "ยังไม่มีข้อมูล" 
+	}
+    return
 }
