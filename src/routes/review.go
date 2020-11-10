@@ -13,22 +13,23 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// IndexReviewHandler is index routing for review usecase
 func IndexReviewHandler(r *mux.Router) {
 	r.HandleFunc("/reviews/last", LastReviewsEndPoint).Methods("GET")
 	r.HandleFunc("/review", CreateReviewEndPoint).Methods("POST")
 	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIDEndPoint).Methods("GET")
 	r.HandleFunc("/review/{reviewid}", FindReviewEndpoint).Methods("GET")
-	r.HandleFunc("/review/report/{reviewid}", UpdateReportByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/review/clap/{reviewid}/{clap}", UpdateClapByIdEndPoint).Methods("PUT")
-	r.HandleFunc("/review/boo/{reviewid}/{boo}", UpdateBooByIdEndPoint).Methods("PUT")
+	r.HandleFunc("/review/report/{reviewid}", UpdateReportByIDEndPoint).Methods("PUT")
+	r.HandleFunc("/review/clap/{reviewid}/{clap}", UpdateClapByIDEndPoint).Methods("PUT")
+	r.HandleFunc("/review/boo/{reviewid}/{boo}", UpdateBooByIDEndPoint).Methods("PUT")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/review/{reviewid}", DeleteReviewByIdEndPoint).Methods("DELETE")
+	r.HandleFunc("/review/{reviewid}", DeleteReviewByIDEndPoint).Methods("DELETE")
 	r.HandleFunc("/report", CreateReportEndPoint).Methods("POST")
 	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
 	// r.HandleFunc("/reviews/{reviewid}", UpdateReviewEndPoint).Methods("PUT")
 }
 
-// GET list of reviews 
+// LastReviewsEndPoint is GET list of reviews 
 // Read param on UrlQuery (eg. /last?offset=5 )
 // Paging by query: page={number_page} offset={number_offset}
 func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +43,7 @@ func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK, reviews)
 }
 
-// POST a new review
+// CreateReviewEndPoint is POST a new review
 func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var class models.Class	
@@ -84,7 +85,7 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusCreated, review)
 }
 
-// GET list of reviews by class_id
+// AllReviewsByClassIDEndPoint is GET list of reviews by class_id
 func AllReviewsByClassIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	page := r.URL.Query().Get("page")
@@ -98,7 +99,7 @@ func AllReviewsByClassIDEndPoint(w http.ResponseWriter, r *http.Request) {
 }
 
 
-// GET a review by its ID
+// FindReviewEndpoint is GET a review by its ID
 func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r) //  param on endpoint
 	review, err := mgoDAO.FindById(params["reviewid"])
@@ -109,8 +110,8 @@ func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK, review)
 }
 
-// GET report of reviews by class_id
-func UpdateReportByIdEndPoint(w http.ResponseWriter, r *http.Request) {
+// UpdateReportByIDEndPoint is GET report of reviews by class_id
+func UpdateReportByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC().Add(7 * time.Hour)
@@ -122,8 +123,8 @@ func UpdateReportByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK,  map[string]string{"result": "success"})
 }
 
-// PUT update clap by id
-func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
+// UpdateClapByIDEndPoint is PUT update clap by id
+func UpdateClapByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC().Add(7 * time.Hour)
 	iclap, _ := strconv.ParseUint(params["clap"],10 ,32)
@@ -134,8 +135,8 @@ func UpdateClapByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-// PUT update boo by id
-func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
+// UpdateBooByIDEndPoint is PUT update boo by id
+func UpdateBooByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC().Add(7 * time.Hour)
 	iboo, _ := strconv.ParseUint(params["boo"],10, 32)
@@ -146,7 +147,7 @@ func UpdateBooByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-// GET list of reviews
+// AllReviewsEndPoint is GET list of reviews
 func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 	reviews, err := mgoDAO.FindAll()
 	if err != nil {
@@ -156,8 +157,8 @@ func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK, reviews)
 }
 
-// DELETE an existing review
-func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
+// DeleteReviewByIDEndPoint is DELETE an existing review
+func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r) 
 	reqToken := r.Header.Get("Authorization")
 	splitToken := strings.Split(reqToken, " ")
@@ -207,7 +208,7 @@ func DeleteReviewByIdEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
+// CreateReportEndPoint is POST create report for the review
 func CreateReportEndPoint(w http.ResponseWriter, r *http.Request) { 
 	defer r.Body.Close()
 	var report models.Report

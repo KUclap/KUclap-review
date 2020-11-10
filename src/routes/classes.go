@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// IndexClassesHandler is index routing for class usecase
 func IndexClassesHandler(r *mux.Router) {
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
 	r.HandleFunc("/class", InsertClassEndpoint).Methods("POST")
@@ -17,7 +18,7 @@ func IndexClassesHandler(r *mux.Router) {
 	r.HandleFunc("/class/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
 }
 
-// GET list of classes
+// AllClassesEndpoint is GET list of classes
 func AllClassesEndpoint(w http.ResponseWriter, r *http.Request) {
 	classes, err := mgoDAO.FindAllClasses()
 	if err != nil {
@@ -27,6 +28,7 @@ func AllClassesEndpoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK, classes)
 }
 
+// InsertClassEndpoint is POST insert class.
 func InsertClassEndpoint(w http.ResponseWriter, r * http.Request){
 	defer r.Body.Close()
 	var class models.Class
@@ -41,7 +43,7 @@ func InsertClassEndpoint(w http.ResponseWriter, r * http.Request){
 	helper.RespondWithJson(w, http.StatusCreated, class)
 }
 
-// GET class by class_id
+// FindClassByClassIDEndpoint is GET class by class_id
 func FindClassByClassIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	class, err := mgoDAO.FindClassByClassID(params["classid"])
@@ -52,7 +54,7 @@ func FindClassByClassIDEndpoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK, class)
 }
 
-// PUT stats by class_id
+// UpdateStatsEndPoint is PUT stats by class_id
 func UpdateStatsEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
