@@ -12,10 +12,11 @@ import (
 
 // IndexClassesHandler is index routing for class usecase
 func IndexClassesHandler(r *mux.Router) {
+	var prefixPath = "/class"
+	r.HandleFunc(prefixPath, InsertClassEndpoint).Methods("POST")
+	r.HandleFunc(prefixPath + "/{classid}", FindClassByClassIDEndpoint).Methods("GET")
+	r.HandleFunc(prefixPath + "/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
 	r.HandleFunc("/classes", AllClassesEndpoint).Methods("GET")
-	r.HandleFunc("/class", InsertClassEndpoint).Methods("POST")
-	r.HandleFunc("/class/{classid}", FindClassByClassIDEndpoint).Methods("GET")
-	r.HandleFunc("/class/{classid}/stats", UpdateStatsEndPoint).Methods("PUT")
 }
 
 // AllClassesEndpoint is GET list of classes

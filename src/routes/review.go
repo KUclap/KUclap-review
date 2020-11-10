@@ -15,15 +15,16 @@ import (
 
 // IndexReviewHandler is index routing for review usecase
 func IndexReviewHandler(r *mux.Router) {
-	r.HandleFunc("/reviews/last", LastReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/review", CreateReviewEndPoint).Methods("POST")
-	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIDEndPoint).Methods("GET")
-	r.HandleFunc("/review/{reviewid}", FindReviewEndpoint).Methods("GET")
-	r.HandleFunc("/review/report/{reviewid}", UpdateReportByIDEndPoint).Methods("PUT")
-	r.HandleFunc("/review/clap/{reviewid}/{clap}", UpdateClapByIDEndPoint).Methods("PUT")
-	r.HandleFunc("/review/boo/{reviewid}/{boo}", UpdateBooByIDEndPoint).Methods("PUT")
+	var prefixPath = "/review"
+	r.HandleFunc(prefixPath, CreateReviewEndPoint).Methods("POST")
+	r.HandleFunc(prefixPath + "/last", LastReviewsEndPoint).Methods("GET")
+	r.HandleFunc(prefixPath + "/{classid}", AllReviewsByClassIDEndPoint).Methods("GET")
+	r.HandleFunc(prefixPath + "/{reviewid}", FindReviewEndpoint).Methods("GET")
+	r.HandleFunc(prefixPath + "/report/{reviewid}", UpdateReportByIDEndPoint).Methods("PUT")
+	r.HandleFunc(prefixPath + "/clap/{reviewid}/{clap}", UpdateClapByIDEndPoint).Methods("PUT")
+	r.HandleFunc(prefixPath + "/boo/{reviewid}/{boo}", UpdateBooByIDEndPoint).Methods("PUT")
+	r.HandleFunc(prefixPath + "/{reviewid}", DeleteReviewByIDEndPoint).Methods("DELETE")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/review/{reviewid}", DeleteReviewByIDEndPoint).Methods("DELETE")
 	r.HandleFunc("/report", CreateReportEndPoint).Methods("POST")
 	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
 	// r.HandleFunc("/reviews/{reviewid}", UpdateReviewEndPoint).Methods("PUT")
