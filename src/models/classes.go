@@ -7,6 +7,7 @@ type Class struct {
 	NameTH			string			`json:"nameTh" bson:"name_th"`
 	NameEN			string			`json:"nameEn" bson:"name_en"`
 	Label			string			`json:"label" bson:"label"`
+	Category		string			`json:"category" bson:"category"`
 	Hours			string			`json:"hours" bson:"hours"`
 	Unit			uint64			`json:"unit" bson:"unit"`
 	NumberReviewer	float64			`json:"numberReviewer" bson:"number_reviewer"`
