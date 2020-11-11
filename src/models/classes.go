@@ -14,6 +14,7 @@ type Class struct {
 	Category		string			`json:"category" bson:"category"`
 	Hours			string			`json:"hours" bson:"hours"`
 	Unit			uint64			`json:"unit" bson:"unit"`
+	NumberQuestion	uint64			`json:"numberQuestion" bson:"number_questions"`
 	NumberReviewer	float64			`json:"numberReviewer" bson:"number_reviewer"`
 	Stats			StatClass		`json:"stats" bson:"stats"`	
 }
