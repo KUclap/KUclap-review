@@ -19,6 +19,7 @@ var serverConfig = config.Config{}
 var mgoDAO = dao.SessionDAO{}
 var kind string
 var port string
+var origin string
 
 // Healthcheck is healthcheck path
 func Healthcheck(w http.ResponseWriter, r *http.Request) {
@@ -34,16 +35,19 @@ func init() {
 	if os.Getenv("KIND") == "development" {
 		kind = serverConfig.Development.Kind
 		port = serverConfig.Application.Port
+		origin = serverConfig.Application.ORIGIN_ALLOWED
 		mgoDAO.Server = serverConfig.Development.Server
 		mgoDAO.Database = serverConfig.Development.Database
 	} else if os.Getenv("KIND") == "production" {
 		kind = serverConfig.Production.Kind
 		port = serverConfig.Application.Port
+		origin = serverConfig.Application.ORIGIN_ALLOWED
 		mgoDAO.Server = serverConfig.Production.Server
 		mgoDAO.Database = serverConfig.Production.Database
 	} else {
 		kind = serverConfig.Development.Kind + " (staging on heroku)"
 		port = os.Getenv("PORT")
+		origin = "*"
 		mgoDAO.Server = serverConfig.Development.Server
 		mgoDAO.Database = serverConfig.Development.Database
 	}
@@ -56,7 +60,7 @@ func init() {
 func main() {
 	log.Println("Starting server... 🤤")
 	
-	origin := serverConfig.Application.ORIGIN_ALLOWED
+	
 	
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Origin", "Authorization", "Content-Type"})
 	exposeOk := handlers.ExposedHeaders([]string{""})
