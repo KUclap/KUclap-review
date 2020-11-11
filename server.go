@@ -20,7 +20,7 @@ var mgoDAO = dao.SessionDAO{}
 var kind string
 var port string
 
-// ROOT request
+// Healthcheck is healthcheck path
 func Healthcheck(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Server is alive 😎")
 }
