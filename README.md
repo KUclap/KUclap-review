@@ -32,7 +32,7 @@ URL : https://www.getpostman.com/collections/79cb50bda1b010277ac9
 To get a local copy up and running follow these simple steps 🎉.
 
 ### Prerequisites 
-Install these prerequisites ✅
+Install these prerequisites ✅ .
 * Go
 * Docker
 
@@ -50,10 +50,10 @@ go get ./...
 
 <!-- USAGE EXAMPLES -->
 ## Development / Usage 
-Use `modd` for live reloading by follow this command 😎
+Use `modd` for live reloading by follow this command 😎 .
 
 ```sh
-    make gomodd
+make gomodd
 ```
 
 ## Deployment 
@@ -61,19 +61,19 @@ Use `modd` for live reloading by follow this command 😎
 ### Staging 
 This command is for deploying to Heroku 🤒 (Stagging Environment).
 ```sh
-    make deploy-to-staging
+make deploy-to-staging
 ```
 
 ### Production 
-Merge commits from master into release branch. The pipeline will deploy to Gandalf's server (DigitalOcean droplet) automatically 😳.
+Merge commits from master into release branch. The pipeline will deploy to Gandalf's server (DigitalOcean droplet) automatically 😳 .
 ```sh
-    git checkout release
-    git pull origin master
-    ...
-    git push 
+git checkout release
+git pull origin master
+...
+git push 
 ```
 
-## Note
+## Note 🌶
 - For more details about commands, Please read `Makefile`.
 - `.github/workflows` is used for storing pipeline script for automated deployment.
 - You have to install `heroku` CLI for deploying image to staging.
