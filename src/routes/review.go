@@ -17,8 +17,8 @@ import (
 func IndexReviewHandler(r *mux.Router) {
 	var prefixPath = "/review"
 	r.HandleFunc(prefixPath, CreateReviewEndPoint).Methods("POST")
-	r.HandleFunc(prefixPath + "/last", LastReviewsEndPoint).Methods("GET")
-	r.HandleFunc(prefixPath + "/{classid}", AllReviewsByClassIDEndPoint).Methods("GET")
+	r.HandleFunc("/reviews/last", LastReviewsEndPoint).Methods("GET")
+	r.HandleFunc("/reviews/{classid}", AllReviewsByClassIDEndPoint).Methods("GET")
 	r.HandleFunc(prefixPath + "/{reviewid}", FindReviewEndpoint).Methods("GET")
 	r.HandleFunc(prefixPath + "/report/{reviewid}", UpdateReportByIDEndPoint).Methods("PUT")
 	r.HandleFunc(prefixPath + "/clap/{reviewid}/{clap}", UpdateClapByIDEndPoint).Methods("PUT")
@@ -103,7 +103,7 @@ func AllReviewsByClassIDEndPoint(w http.ResponseWriter, r *http.Request) {
 // FindReviewEndpoint is GET a review by its ID
 func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r) //  param on endpoint
-	review, err := mgoDAO.FindById(params["reviewid"])
+	review, err := mgoDAO.FindByID(params["reviewid"])
 	if err != nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
 		return
@@ -117,7 +117,7 @@ func UpdateReportByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC().Add(7 * time.Hour)
 
-	if err := mgoDAO.UpdateReportById(params["reviewid"], updateAt); err != nil {
+	if err := mgoDAO.UpdateReportByID(params["reviewid"], updateAt); err != nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review id")
 		return
 	}
@@ -129,7 +129,7 @@ func UpdateClapByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC().Add(7 * time.Hour)
 	iclap, _ := strconv.ParseUint(params["clap"],10 ,32)
-	if err := mgoDAO.UpdateClapById(params["reviewid"], iclap, updateAt); err != nil {
+	if err := mgoDAO.UpdateClapByID(params["reviewid"], iclap, updateAt); err != nil {
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -141,7 +141,7 @@ func UpdateBooByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	updateAt := time.Now().UTC().Add(7 * time.Hour)
 	iboo, _ := strconv.ParseUint(params["boo"],10, 32)
-	if err := mgoDAO.UpdateBooById(params["reviewid"], iboo, updateAt); err != nil {
+	if err := mgoDAO.UpdateBooByID(params["reviewid"], iboo, updateAt); err != nil {
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -166,7 +166,7 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	reqAuth := splitToken[1]
 	var class models.Class
 	
-	review, err := mgoDAO.FindById(params["reviewid"])
+	review, err := mgoDAO.FindReviewAllPropertyByID(params["reviewid"])
 	if err != nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
 		return
@@ -199,7 +199,7 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if review.Auth == reqAuth {
-		if err := mgoDAO.DeleteById(params["reviewid"]); err != nil {
+		if err := mgoDAO.DeleteByID(params["reviewid"]); err != nil {
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -220,7 +220,7 @@ func CreateReportEndPoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updateAt := time.Now().UTC().Add(7 * time.Hour)
-	if err := mgoDAO.UpdateReportById(report.ReviewID, updateAt); err != nil {
+	if err := mgoDAO.UpdateReportByID(report.ReviewID, updateAt); err != nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review id")
 		return
 	}
