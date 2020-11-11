@@ -43,6 +43,7 @@ type ResReview struct {
 	Grade		string			`json:"grade" bson:"grade"`
 	Clap		uint64			`json:"clap" bson:"clap"`
 	Boo			uint64			`json:"boo" bson:"boo"`
+	Stats		StatReview		`json:"stats" bson:"stats"`	
 	ClassNameTH	string			`json:"classNameTH" bson:"class_name_th"`
 	ClassNameEN	string			`json:"classNameEN" bson:"class_name_en"`
 	Sec			uint64			`json:"sec" bson:"sec"`
