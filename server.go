@@ -59,6 +59,7 @@ func main() {
 	routes.InjectAdapterDAO(&mgoDAO)
 	routes.IndexClassesHandler(r)
 	routes.IndexReviewHandler(r)
+	routes.IndexQuestionsHandler(r)
 	r.HandleFunc("/healthcheck", Healthcheck).Methods("GET")
 	log.Println("Running on " + kind + " Mode 🌶")	
 	log.Println("Server listening on port " + port + " 🚀")
