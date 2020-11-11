@@ -59,9 +59,3 @@ type RDeleteReview struct {
 	ID			string			`json:"reviewId" bson:"_id"`
 	Auth		string			`json:"auth" bson:"auth"`
 }
-
-
-
-// Sec			uint64			`json:"sec" bson:"sec"`
-// Semester	uint64			`json:"semester" bson:"semester"`
-// Year		uint64			`json:"year" bson:"year"`
