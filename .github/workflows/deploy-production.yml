@@ -19,7 +19,7 @@ jobs:
           registry: docker.pkg.github.com
           username: ${{ secrets.GIT_USERNAME }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          dockerfile: ./docker/API.Dockerfile
+          dockerfile: ./docker/Prod.Dockerfile
           tags: "1.0.0, latest"
           buildargs: GIT_ACCESS_TOKEN_CURL_CONFIG
       - name: Deploy package to digitalocean

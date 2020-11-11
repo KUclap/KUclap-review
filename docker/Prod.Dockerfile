@@ -1,4 +1,5 @@
 FROM golang:1.15
+FROM golang:1.15
 
 ARG GIT_ACCESS_TOKEN_CURL_CONFIG
 
