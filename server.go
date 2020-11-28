@@ -45,11 +45,11 @@ func init() {
 		mgoDAO.Server = serverConfig.Production.Server
 		mgoDAO.Database = serverConfig.Production.Database
 	} else if os.Getenv("KIND") == "preproduction" {
-		kind = serverConfig.Production.Kind
-		port = serverConfig.Production.Port
-		origin = serverConfig.Production.OriginAllowed
-		mgoDAO.Server = serverConfig.Production.Server
-		mgoDAO.Database = serverConfig.Production.Database
+		kind = serverConfig.PreProduction.Kind
+		port = serverConfig.PreProduction.Port
+		origin = serverConfig.PreProduction.OriginAllowed
+		mgoDAO.Server = serverConfig.PreProduction.Server
+		mgoDAO.Database = serverConfig.PreProduction.Database
 	} else {
 		kind = serverConfig.Development.Kind + " (staging on heroku)"
 		port = os.Getenv("PORT")
