@@ -6,27 +6,35 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type application struct {
+type preproduction struct {
+	Kind string
 	Port string
-	ORIGIN_ALLOWED string
+	OriginAllowed string
+	Server string
+	Database string
 }
 
 type production struct {
 	Kind string
+	Port string
+	OriginAllowed string
 	Server string
 	Database string
 }
 
 type development struct {
 	Kind string
+	Port string
+	OriginAllowed string
 	Server string
 	Database string
 }
 
+// Config is struct for parse data from toml
 type Config struct {
-	Application	application
-	Production	production
-	Development	development
+	PreProduction	preproduction
+	Production		production
+	Development		development
 }
 
 // Read and parse the configuration file

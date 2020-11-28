@@ -34,20 +34,26 @@ func init() {
 	
 	if os.Getenv("KIND") == "development" {
 		kind = serverConfig.Development.Kind
-		port = serverConfig.Application.Port
-		origin = serverConfig.Application.ORIGIN_ALLOWED
+		port = serverConfig.Development.Port
+		origin = serverConfig.Development.OriginAllowed
 		mgoDAO.Server = serverConfig.Development.Server
 		mgoDAO.Database = serverConfig.Development.Database
 	} else if os.Getenv("KIND") == "production" {
 		kind = serverConfig.Production.Kind
-		port = serverConfig.Application.Port
-		origin = serverConfig.Application.ORIGIN_ALLOWED
+		port = serverConfig.Production.Port
+		origin = serverConfig.Production.OriginAllowed
+		mgoDAO.Server = serverConfig.Production.Server
+		mgoDAO.Database = serverConfig.Production.Database
+	} else if os.Getenv("KIND") == "preproduction" {
+		kind = serverConfig.Production.Kind
+		port = serverConfig.Production.Port
+		origin = serverConfig.Production.OriginAllowed
 		mgoDAO.Server = serverConfig.Production.Server
 		mgoDAO.Database = serverConfig.Production.Database
 	} else {
 		kind = serverConfig.Development.Kind + " (staging on heroku)"
 		port = os.Getenv("PORT")
-		origin = "*"
+		origin = serverConfig.Development.OriginAllowed
 		mgoDAO.Server = serverConfig.Development.Server
 		mgoDAO.Database = serverConfig.Development.Database
 	}

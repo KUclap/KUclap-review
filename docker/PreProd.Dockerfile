@@ -10,7 +10,7 @@ RUN mv config.toml ./config/config.toml && mkdir builder
 RUN go get ./...
 RUN go build -o ./builder/kuclap-review-api .
 
-ENV KIND=production 
+ENV KIND=preproduction 
 CMD ["./builder/kuclap-review-api"]
 
-EXPOSE 8000
+EXPOSE 8089
