@@ -22,6 +22,7 @@ type Review struct {
 	Sec			uint64			`json:"sec" bson:"sec"`
 	Semester	uint64			`json:"semester" bson:"semester"`
 	Year		uint64			`json:"year" bson:"year"`
+	Recap		string			`json:"recap" bson:"recap"`
 	CreatedAt	time.Time		`json:"createdAt" bson:"created_at"`
 	UpdateAt	time.Time		`json:"updateAt" bson:"update_at"`
 	Reported	bool			`json:"reported" bson:"reported"`
@@ -49,6 +50,7 @@ type ResReview struct {
 	Sec			uint64			`json:"sec" bson:"sec"`
 	Semester	uint64			`json:"semester" bson:"semester"`
 	Year		uint64			`json:"year" bson:"year"`
+	Recap		string			`json:"recap" bson:"recap"`
 	CreatedAt	time.Time		`json:"createdAt" bson:"created_at"`
 	UpdateAt	time.Time		`json:"updateAt" bson:"update_at"`
 	Reported	bool			`json:"reported" bson:"reported"`
@@ -58,4 +60,16 @@ type ResReview struct {
 type RDeleteReview struct {
 	ID			string			`json:"reviewId" bson:"_id"`
 	Auth		string			`json:"auth" bson:"auth"`
+}
+
+// SetBSON is function for filling default value when load value from mongo
+func (review *ResReview) SetBSON(raw bson.Raw) (err error) {
+	type my ResReview
+    if err = raw.Unmarshal((*my)(review)); err != nil {
+        return
+	}
+	review.Stats.How = review.Stats.How * 20
+	review.Stats.Homework = review.Stats.Homework * 20
+	review.Stats.Interest = review.Stats.Interest * 20
+    return
 }

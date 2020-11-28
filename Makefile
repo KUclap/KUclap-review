@@ -1,12 +1,12 @@
 pkg = github.com/KUclap/KUclap-review
-APP_PROD = kuclap-api
+# APP_PROD = kuclap-api
 APP_STAGING = kuclap-api-staging
 DYNO = web
 uppkg: push-and-get-go
 goget: go-get
 herokucp: heroku-container-push-web
 herokucr: heroku-container-release-web
-deploy-to-prod: cp-cr-prod
+# deploy-to-prod: cp-cr-prod
 deploy-to-staging: cp-cr-staging
 
 ### Development (PRODUCTION)
@@ -29,15 +29,15 @@ heroku-login:
 heroku-container-login:
 	heroku container:login
 
-heroku-container-push-web:
-	heroku container:push ${DYNO} --app ${APP_PROD}
+# heroku-container-push-web:
+# 	heroku container:push ${DYNO} --app ${APP_PROD}
 
-heroku-container-release-web:
-	heroku container:release ${DYNO} --app ${APP_PROD}
+# heroku-container-release-web:
+# 	heroku container:release ${DYNO} --app ${APP_PROD}
 
 ### Deploy to Heroku
-cp-cr-prod:
-	heroku container:push ${DYNO} --app ${APP_PROD} && heroku container:release ${DYNO} --app ${APP_PROD}
+# cp-cr-prod:
+# 	heroku container:push ${DYNO} --app ${APP_PROD} && heroku container:release ${DYNO} --app ${APP_PROD}
 
 cp-cr-staging:
 	heroku container:push ${DYNO} --recursive --context-path . --app ${APP_STAGING} && heroku container:release ${DYNO} --app ${APP_STAGING}
@@ -55,6 +55,4 @@ duplicate-collection-to-another-db:
 
 ### Build docker container
 build-docker:
-	docker build -f ./docker/API.Dockerfile -t kuclap-review-api-v2
-
-### Deploy to production (Digital Ocean)
+	docker build -f ./docker/Prod.Dockerfile -t kuclap-review-api-v2
