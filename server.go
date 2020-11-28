@@ -66,8 +66,6 @@ func init() {
 func main() {
 	log.Println("Starting server... 🤤")
 	
-	
-	
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Origin", "Authorization", "Content-Type"})
 	exposeOk := handlers.ExposedHeaders([]string{""})
 	originsOk := handlers.AllowedOrigins([]string{origin})
