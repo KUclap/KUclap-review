@@ -64,12 +64,16 @@ type RDeleteReview struct {
 
 // SetBSON is function for filling default value when load value from mongo
 func (review *ResReview) SetBSON(raw bson.Raw) (err error) {
+	
 	type my ResReview
-    if err = raw.Unmarshal((*my)(review)); err != nil {
-        return
+
+	if err = raw.Unmarshal((*my)(review)); err != nil {
+		return
 	}
-	review.Stats.How = review.Stats.How * 20
-	review.Stats.Homework = review.Stats.Homework * 20
-	review.Stats.Interest = review.Stats.Interest * 20
-    return
+	review.Stats.How		=	review.Stats.How * 20
+	review.Stats.Homework	=	review.Stats.Homework * 20
+	review.Stats.Interest	=	review.Stats.Interest * 20
+
+	return
+	
 }

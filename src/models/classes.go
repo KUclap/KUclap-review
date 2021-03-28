@@ -35,21 +35,26 @@ type OldClass struct {
 
 // GetBSON is function for filling default value when save value on mongo
 func (class *Class) GetBSON() (interface{}, error) {
-    if class.Category == "" {
-		class.Category = "ยังไม่มีข้อมูล" 
-    }
-    type my *Class
-    return my(class), nil
+
+	if class.Category	==	"" {
+		class.Category	=	"ยังไม่มีข้อมูล" 
+	}
+
+	type my *Class
+	return my(class), nil
 }
 
 // SetBSON is function for filling default value when load value from mongo
 func (class *Class) SetBSON(raw bson.Raw) (err error) {
 	type my Class
-    if err = raw.Unmarshal((*my)(class)); err != nil {
-        return
+
+	if err = raw.Unmarshal((*my)(class)); err != nil {
+		return
 	}
-	if class.Category == "" {
-		class.Category = "ยังไม่มีข้อมูล" 
+
+	if class.Category	==	"" {
+		class.Category	=	"ยังไม่มีข้อมูล" 
 	}
-    return
+
+	return
 }

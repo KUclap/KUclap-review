@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	COLLECTION_REVIEWS = "reviews"
-	COLLECTION_CLASSES = "classes"
-	COLLECTION_REPORTS = "reported"
-	COLLECTION_QUESTION = "questions"
+	COLLECTION_REVIEWS	=	"reviews"
+	COLLECTION_CLASSES	=	"classes"
+	COLLECTION_REPORTS	=	"reported"
+	COLLECTION_QUESTION	=	"questions"
 )
 
 // SessionDAO is struct for allocate info for create connection with mongoDB
@@ -33,23 +33,26 @@ var session *mgo.Session
 
 // Connect is Establish a connection to database
 func (m *SessionDAO) Connect() {
-	tlsConfig := &tls.Config{}
-	dialInfo, err := mgo.ParseURL(m.Server)
-	log.Println("MGO: Parseurl finish, Connecting... ✅")
-	dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
-		conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
+
+	tlsConfig		:=	&tls.Config{}
+
+	dialInfo, err	:=	mgo.ParseURL(m.Server)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dialInfo.DialServer	=	func(addr *mgo.ServerAddr) (net.Conn, error) {
+		conn, err	:=	tls.Dial("tcp", addr.String(), tlsConfig)
 		return conn, err
 	}
-	log.Println("MGO: TLS configed, Connecting... ✅")
-	session, err = mgo.DialWithInfo(dialInfo)
-	
+
+	session, err	=	mgo.DialWithInfo(dialInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	session.SetMode(mgo.Monotonic, true)
 
-	// session = mgoSession.DB(m.Database)
 	log.Println("MGO: Mongo has connected, Server get origin session. 🎉")
 }
 
@@ -60,9 +63,11 @@ func (m *SessionDAO) Connect() {
 
 // InsertReport is Insert report to database
 func (m *SessionDAO) InsertReport(report models.Report) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_REPORTS).Insert(&report)
+
+	err	:=	db.DB(m.Database).C(COLLECTION_REPORTS).Insert(&report)
+
 	return err	
 }
 
@@ -72,54 +77,67 @@ func (m *SessionDAO) InsertReport(report models.Report) error {
 
 // UpdateStatsClassByCreated is Update stats on class by class_id 
 func (m *SessionDAO) UpdateStatsClassByCreated(classID string, newStats models.StatClass) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": 1}})
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": 1}})
+
 	return err
 }
 
 // UpdateStatsClassByDeleted is Update stats on class by class_id 
 func (m *SessionDAO) UpdateStatsClassByDeleted(classID string, newStats models.StatClass) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": -1}})
+
+	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": -1}})
+
 	return err
 }
 
 // UpdateNuberReviewByClassID is Update number of review
 func (m *SessionDAO) UpdateNuberReviewByClassID(classID string, updateAt time.Time) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$inc": bson.M{"number_reviewer": 1}})
+
+	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$inc": bson.M{"number_reviewer": 1}})
+	
 	return err
 }
 
 // FindClassByClassID is Find class by class_id
 func (m *SessionDAO) FindClassByClassID(classID string) (models.Class, error) {
-	db := session.Copy()
-	defer db.Close()
 	var class models.Class
+
+	db	:=	session.Copy()
+	defer db.Close()
+
 	err := db.DB(m.Database).C(COLLECTION_CLASSES).Find(bson.M{"class_id": classID}).One(&class)
+
 	return class, err
 }
 
 // FindAllClasses is Find All of list of classes 
 func (m *SessionDAO) FindAllClasses() ([]models.Class, error) {
-	db := session.Copy()
-	defer db.Close()
 	var classes []models.Class
-	err := db.DB(m.Database).C(COLLECTION_CLASSES).Find(bson.M{}).All(&classes)
+
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Find(bson.M{}).All(&classes)
+	
 	return classes, err
 }
 
 // InsertClass is Insert class to database
 func (m *SessionDAO) InsertClass(class models.Class) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_CLASSES).Insert(&class)
+
+	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Insert(&class)
+
 	return err	
 }
-
 
 // ###################################
 // ######## REVIEW APDAPTER ##########
@@ -127,54 +145,75 @@ func (m *SessionDAO) InsertClass(class models.Class) error {
 
 // UpdateClapByID is Update clap by id
 func (m *SessionDAO) UpdateClapByID(id string, newClap uint64, updateAt time.Time) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newClap}, "$set": bson.M{"update_at": updateAt}})
+
+	err	:=	db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"clap": newClap}, "$set": bson.M{"update_at": updateAt}})
+	
 	return err
 }
 
 // UpdateBooByID is Update boo by id
 func (m *SessionDAO) UpdateBooByID(id string, newBoo uint64, updateAt time.Time) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"boo": newBoo}, "$set": bson.M{"update_at": updateAt}})
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$inc": bson.M{"boo": newBoo}, "$set": bson.M{"update_at": updateAt}})
+	
 	return err
 }
 
 // UpdateReportByID is Update reported
 func (m *SessionDAO) UpdateReportByID(id string, updateAt time.Time) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"reported": true, "update_at": updateAt}})
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"reported": true, "update_at": updateAt}})
+	
 	return err
 }
 
 // FindReviewsByClassID is Find reviews by class_id
 func (m *SessionDAO) FindReviewsByClassID(classID string, page string, offset string) ([]models.ResReview, error) {
-	db := session.Copy()
-	defer db.Close()
 	var reviews []models.ResReview
-	iPage, err := strconv.Atoi(page)
-	iOffset, err := strconv.Atoi(offset)
+
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	iPage, err		:=	strconv.Atoi(page)
 	if err != nil {
 		log.Println("err : atoi.", err)
 	}
-	err = db.DB(m.Database).C(COLLECTION_REVIEWS).Find(bson.M{"class_id": classID}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&reviews)
+
+	iOffset, err	:=	strconv.Atoi(offset)
+	if err != nil {
+		log.Println("err : atoi.", err)
+	}
+
+	err	=	db.DB(m.Database).C(COLLECTION_REVIEWS).Find(bson.M{"class_id": classID}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&reviews)
+
 	return reviews, err
 }
 
 // LastReviews is Find last reviews range with offset
 func (m *SessionDAO) LastReviews(page string,offset string) ([]models.ResReview, error) {
-	db := session.Copy()
-	defer db.Close()
 	var reviews []models.ResReview
-	iPage, err := strconv.Atoi(page)
-	iOffset, err := strconv.Atoi(offset)
+
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	iPage, err		:=	strconv.Atoi(page)
 	if err != nil {
 		log.Println("err : atoi.", err)
 	}
-	// err = db.DB(m.Database).C(COLLECTION_REVIEWS).Find(bson.M{}).Sort("-$natural").Limit(iOffset).All(&reviews)
+
+	iOffset, err	:=	strconv.Atoi(offset)
+	if err != nil {
+		log.Println("err : atoi.", err)
+	}
+	
 	err = db.DB(m.Database).C(COLLECTION_REVIEWS).Find(bson.M{}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&reviews)
+
 	return reviews, err
 }
 
@@ -189,35 +228,45 @@ func (m *SessionDAO) FindAll() ([]models.ResReview, error) {
 
 // FindByID is Find a review by its id
 func (m *SessionDAO) FindByID(id string) (models.ResReview, error) {
-	db := session.Copy()
-	defer db.Close()
 	var review models.ResReview
-	err := db.DB(m.Database).C(COLLECTION_REVIEWS).FindId(bson.ObjectIdHex(id)).One(&review)
+
+	db	:=	session.Copy()
+	defer db.Close()
+
+	err	:=	db.DB(m.Database).C(COLLECTION_REVIEWS).FindId(bson.ObjectIdHex(id)).One(&review)
+	
 	return review, err
 }
 
 // FindReviewAllPropertyByID is Find a review by its id
 func (m *SessionDAO) FindReviewAllPropertyByID(id string) (models.Review, error) {
-	db := session.Copy()
-	defer db.Close()
 	var review models.Review
-	err := db.DB(m.Database).C(COLLECTION_REVIEWS).FindId(bson.ObjectIdHex(id)).One(&review)
+
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_REVIEWS).FindId(bson.ObjectIdHex(id)).One(&review)
+	
 	return review, err
 }
 
 // Insert a review into database
 func (m *SessionDAO) Insert(review models.Review) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_REVIEWS).Insert(&review)
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_REVIEWS).Insert(&review)
+	
 	return err
 }
 
 // DeleteByID is Delete an existing review
 func (m *SessionDAO) DeleteByID(id string) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_REVIEWS).RemoveId(bson.ObjectIdHex(id))
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_REVIEWS).RemoveId(bson.ObjectIdHex(id))
+	
 	return err
 }
 
@@ -240,79 +289,111 @@ func (m *SessionDAO) DeleteByID(id string) error {
 
 // CreateQuestion is POST create question.
 func (m *SessionDAO) CreateQuestion(question models.Question) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_QUESTION).Insert(&question)
+
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Insert(&question)
+	
 	return err
 }
 
 // UpdateNumberQuestionByClassID is Update number of review
 func (m *SessionDAO) UpdateNumberQuestionByClassID(classID string, number int, updateAt time.Time) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{ "$inc": bson.M{"number_questions": int32(number)}, "$set": bson.M{"update_at": updateAt} })
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{ "$inc": bson.M{"number_questions": int32(number)}, "$set": bson.M{"update_at": updateAt} })
+	
 	return err
 }
 
 // FindAllQuestions is Find All of list of question 
 func (m *SessionDAO) FindAllQuestions() ([]models.Question, error) {
-	db := session.Copy()
-	defer db.Close()
 	var questions []models.Question
-	err := db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{}).All(&questions)
+
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{}).All(&questions)
 	return questions, err
 }
 
 // FindQuestionsByClassID is Find question by class_id
 func (m *SessionDAO) FindQuestionsByClassID(classID string, page string, offset string) ([]models.ResQuestion, error) {
+	var questions []models.ResQuestion
+
 	db := session.Copy()
 	defer db.Close()
-	var questions []models.ResQuestion
-	iPage, err := strconv.Atoi(page)
-	iOffset, err := strconv.Atoi(offset)
+
+	iPage, err		:=	strconv.Atoi(page)
 	if err != nil {
 		log.Println("err : atoi.", err)
 	}
+
+	iOffset, err	:=	strconv.Atoi(offset)
+	if err != nil {
+		log.Println("err : atoi.", err)
+	}
+
 	err = db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"class_id": classID}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&questions)
+	
 	return questions, err
 }
 
 // LastQuestions is Find last questions range with offset
 func (m *SessionDAO) LastQuestions(page string, offset string) ([]models.ResQuestion, error) {
-	db := session.Copy()
-	defer db.Close()
 	var questions []models.ResQuestion
-	iPage, err := strconv.Atoi(page)
-	iOffset, err := strconv.Atoi(offset)
+
+	db	:=	session.Copy()
+	defer db.Close()
+
+	
+	iPage, err		:=	strconv.Atoi(page)
 	if err != nil {
 		log.Println("err : atoi.", err)
 	}
-	err = db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&questions)
+
+	iOffset, err	:=	strconv.Atoi(offset)
+	if err != nil {
+		log.Println("err : atoi.", err)
+	}
+
+	err	=	db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&questions)
+	
 	return questions, err
 }
 
 // FindQuestionByID is Find question by question_id
 func (m *SessionDAO) FindQuestionByID(questionID string) (models.ResQuestion, error) {
-	db := session.Copy()
-	defer db.Close()
 	var question models.ResQuestion
-	err := db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"question_id": bson.ObjectIdHex(questionID) }).One(&question)
+
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"question_id": bson.ObjectIdHex(questionID) }).One(&question)
+	
 	return question, err
 }
 
 // FindQuestionAllPropertyByID is Find question by question_id
 func (m *SessionDAO) FindQuestionAllPropertyByID(questionID string) (models.Question, error) {
-	db := session.Copy()
-	defer db.Close()
 	var question models.Question
-	err := db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"question_id": bson.ObjectIdHex(questionID) }).One(&question)
+
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"question_id": bson.ObjectIdHex(questionID) }).One(&question)
+	
 	return question, err
 }
 
 // DeleteQuestionByID is Delete an existing review
 func (m *SessionDAO) DeleteQuestionByID(questionID string) error {
-	db := session.Copy()
+	db	:=	session.Copy()
 	defer db.Close()
-	err := db.DB(m.Database).C(COLLECTION_QUESTION).Remove(bson.M{"question_id": bson.ObjectIdHex(questionID)})
+
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Remove(bson.M{"question_id": bson.ObjectIdHex(questionID)})
+	
 	return err
 }
