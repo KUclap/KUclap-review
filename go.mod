@@ -5,6 +5,9 @@ go 1.15
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/KUclap/KUclap-review v0.0.0-20201108090610-42e4bc9f8d8e
+	github.com/aws/aws-sdk-go-v2 v1.3.1
+	github.com/aws/aws-sdk-go-v2/config v1.1.3
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.3.0
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.3.0
