@@ -60,6 +60,7 @@ func main() {
 	routes.IndexClassesHandler(r)
 	routes.IndexReviewHandler(r)
 	routes.IndexQuestionsHandler(r)
+	routes.IndexRecapHandler(r)
 
 	r.HandleFunc("/healthcheck", Healthcheck).Methods("GET")
 
