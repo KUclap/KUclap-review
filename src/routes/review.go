@@ -40,6 +40,7 @@ func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	page			:=	r.URL.Query().Get("page")
 	offset			:=	r.URL.Query().Get("offset")
+	
 	reviews, err	:=	mgoDAO.LastReviews(page ,offset)
 
 	if err	!=	nil {
@@ -199,47 +200,60 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	
 	var class models.Class
 
-	params		:=	mux.Vars(r) 
+	params		:=	mux.Vars(r)
+
 	reqToken	:=	r.Header.Get("Authorization")
 	splitToken	:=	strings.Split(reqToken, " ")
 	reqAuth		:=	splitToken[1]
-	review, err	:=	mgoDAO.FindReviewAllPropertyByID(params["reviewid"])
 
+	review, err	:=	mgoDAO.FindReviewAllPropertyByID(params["reviewid"])
 	if err	!=	nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
 		return
 	}
 	
-	class, err	=	mgoDAO.FindClassByClassID(review.ClassID)
-	if err	!=	nil {
-		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	var newStats	models.StatClass
-	var oldStats =	class.Stats
-
-	if class.NumberReviewer ==  1 {
-		// Ignore NaN when we divide with zero
-		newStats.How		=	0
-		newStats.Homework	=	0
-		newStats.Interest	=	0
-	} else {
-		newStats.How		=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
-		newStats.Homework	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Homework,  review.Stats.Homework)
-		newStats.Interest	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
-	}
-	
-	newStats.UpdateAt	=	time.Now().UTC().Add(7 * time.Hour) 
-
-	if err	=	mgoDAO.UpdateStatsClassByDeleted(review.ClassID, newStats); err != nil {
-		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
 	if review.Auth	==	reqAuth {
 		
+		// Delete the review.
+		class, err	=	mgoDAO.FindClassByClassID(review.ClassID)
+		if err	!=	nil {
+			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		var newStats	models.StatClass
+		var oldStats =	class.Stats
+
+		if class.NumberReviewer ==  1 {
+			// Ignore NaN when we divide with zero
+			newStats.How		=	0
+			newStats.Homework	=	0
+			newStats.Interest	=	0
+		} else {
+			newStats.How		=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
+			newStats.Homework	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Homework,  review.Stats.Homework)
+			newStats.Interest	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
+		}
+		
+		newStats.UpdateAt	=	time.Now().UTC().Add(7 * time.Hour) 
+		
 		if err	:=	mgoDAO.DeleteByID(params["reviewid"]); err != nil {
+			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		if err	=	mgoDAO.UpdateStatsClassByDeleted(review.ClassID, newStats); err != nil {
+			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		// Delete recap on the review.
+		if err	:=	mgoDAO.DeleteRecapByID(review.RecapID); err != nil {
+			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		if err	=	mgoDAO.UpdateNumberRecapByClassID(review.ClassID, -1); err != nil {
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -247,10 +261,9 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 		helper.RespondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 
 	} else {
-
 		helper.RespondWithError(w, http.StatusInternalServerError, "your auth isn't match.")
-
 	}
+
 }
 
 // CreateReportEndPoint is POST create report for the review
