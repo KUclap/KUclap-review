@@ -1,10 +1,8 @@
 package routes 
 
 import (
-	// "fmt"
 	"encoding/json"
 	"net/http"
-	// "strconv"
 	"strings"
 	"time"
 	"kuclap-review-api/src/models"
@@ -56,7 +54,7 @@ func CreateQuestionEndPoint(w http.ResponseWriter, r *http.Request) {
 	
 	question.ClassNameTH	=	class.NameTH
 	question.ClassNameEN	=	class.NameEN
-	question.CreatedAt		=	time.Now().UTC().Add(7 * time.Hour) 
+	question.CreatedAt		=	time.Now().UTC().Add(7 * time.Hour)
 	question.UpdateAt		=	question.CreatedAt
 	question.ID				=	bson.NewObjectId()
 	question.Answer			=	make([]models.Answer, 0)
@@ -148,12 +146,6 @@ func DeleteQuestionByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updateAt		:=	time.Now().UTC().Add(7 * time.Hour)
-	if err	=	mgoDAO.UpdateNumberQuestionByClassID(question.ClassID, -1, updateAt); err != nil {
-		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
 	if question.Auth == reqAuth {
 		
 		if err	:=	mgoDAO.DeleteQuestionByID(params["questionid"]); err != nil {
@@ -161,11 +153,16 @@ func DeleteQuestionByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		updateAt		:=	time.Now().UTC().Add(7 * time.Hour)
+	
+		if err	=	mgoDAO.UpdateNumberQuestionByClassID(question.ClassID, -1, updateAt); err != nil {
+			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
 		helper.RespondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 
 	} else {
-
 		helper.RespondWithError(w, http.StatusInternalServerError, "your auth isn't match.")
-
 	}
 }
