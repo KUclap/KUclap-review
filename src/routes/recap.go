@@ -69,8 +69,6 @@ func PresignedDownloadRecapEndPoint(w http.ResponseWriter, r *http.Request) {
 
 func PresignedUploadRecapEndPoint(w http.ResponseWriter, r *http.Request){
 
-	// var	payload	storage.PresignedResponse
-
 	params		:=	mux.Vars(r)
 	author			:=	r.URL.Query().Get("author")
 
