@@ -30,9 +30,9 @@ type Review struct {
 
 // StatReview is model for storing stat on the review
 type StatReview struct {
-	How				float64		`json:"how" bson:"how"`
-	Homework		float64		`json:"homework" bson:"homework"`
-	Interest		float64		`json:"interest" bson:"interest"`
+	How				float64			`json:"how" bson:"how"`
+	Homework		float64			`json:"homework" bson:"homework"`
+	Interest		float64			`json:"interest" bson:"interest"`
 }
 
 // ResReview is struct for body response to client 
@@ -54,6 +54,45 @@ type ResReview struct {
 	CreatedAt		time.Time		`json:"createdAt" bson:"created_at"`
 	UpdateAt		time.Time		`json:"updateAt" bson:"update_at"`
 	Reported		bool			`json:"reported" bson:"reported"`
+}
+
+type ReviewFilterField struct {
+	// specific filtering
+	ClassID			*string			`schema:"class_id" bson:"class_id" type:"match"`
+	RecapID			*string			`schema:"recap_id" bson:"recap_id" type:"match"`
+	Author			*string			`schema:"author" bson:"author" type:"match"`
+	ClassNameTH		*string			`schema:"class_name_th" bson:"class_name_th" type:"match"`
+	ClassNameEN		*string			`schema:"class_name_en" bson:"class_name_en" type:"match"`
+	Grade			*string			`schema:"grade" bson:grade" type:"match"`
+	Sec				*uint64			`schema:"sec" bson:"sec" type:"match"`
+	Semester		*uint64			`schema:"semester" bson:"semester" type:"match"`
+	Year			*uint64			`schema:"year" bson:"year" type:"match"`
+	Reported		*bool			`schema:"reported" bson:"reported" type:"match"`
+
+	// substring filtering
+	Text			*string			`schema:"text" bson:"text" type:"text"`
+
+	// length greater than filtering
+	ClapGte			*uint64			`schema:"clap_gte" bson:"clap" type:"length" operation:"$gte"`
+	BooGte			*uint64			`schema:"boo_gte" bson:"boo" type:"length" operation:"$gte"`
+	HowGte			*float64		`schema:"how_gte" bson:"how" type:"length" operation:"$gte"`
+	HomeworkGte		*float64		`schema:"homework_gte" bson:"homework" type:"length" operation:"$gte"`
+	InterestGte		*float64		`schema:"interest_gte" bson:"interest" type:"length" operation:"$gte"`
+
+	// length less than filtering
+	ClapLte			*uint64			`schema:"clap_lte" bson:"clap" type:"length" operation:"$lte"`
+	BooLte			*uint64			`schema:"boo_lte" bson:"boo" type:"length" operation:"$lte"`
+	HowLte			*float64		`schema:"how_lte" bson:"how" type:"length" operation:"$lte"`
+	HomeworkLte		*float64		`schema:"homework_lte" bson:"homework" type:"length" operation:"$lte"`
+	InterestLte		*float64		`schema:"interest_lte" bson:"interest" type:"length" operation:"$lte"`
+
+	// date greater than filtering
+	CreatedAtGte	*string			`schema:"created_at_gte" bson:"created_at" type:"date" operation:"$gte"`
+	UpdateAtGte		*string			`schema:"update_at_gte" bson:"update_at" type:"date" operation:"$gte"`
+
+	// date less than filtering
+	CreatedAtLte	*string			`schema:"created_at_lte" bson:"created_at" type:"date" operation:"$lte"`
+	UpdateAtLte		*string			`schema:"update_at_lte" bson:"update_at" type:"date" operation:"$lte"`
 }
 
 // RDeleteReview is require struct for delete the review
