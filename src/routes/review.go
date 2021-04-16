@@ -6,10 +6,14 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"log"
+	// "fmt"
+	
 	"kuclap-review-api/src/models"
 	"kuclap-review-api/src/helper"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -40,10 +44,24 @@ func LastReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	page			:=	r.URL.Query().Get("page")
 	offset			:=	r.URL.Query().Get("offset")
+
+	filter	:=	new(models.ReviewFilterField)
 	
-	reviews, err	:=	mgoDAO.LastReviews(page ,offset)
+	decoder :=	schema.NewDecoder()
+	decoder.IgnoreUnknownKeys(true)
+
+	if err := decoder.Decode(filter, r.URL.Query()); err != nil {
+		log.Println("Error in decoding Query on request: ", err)
+		helper.RespondWithError(w, http.StatusBadRequest, "Invalid Query")
+		return
+	}
+
+	querys			:=	helper.CreateQueryFiltering(filter)
+
+	reviews, err	:=	mgoDAO.LastReviews(page ,offset, querys)
 
 	if err	!=	nil {
+		log.Println("Error in LastReviews DAO : ", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review offset")
 		return
 	}
@@ -61,12 +79,14 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	
 	if err	:=	json.NewDecoder(r.Body).Decode(&review); err != nil {
+		log.Println("Error in decoding body on request", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
 	class, err	:=	mgoDAO.FindClassByClassID(review.ClassID)
 	if err	!=	nil {
+		log.Println("Error in FindClassByClassID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -80,6 +100,7 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	newStats.UpdateAt	=	time.Now().UTC().Add(7 * time.Hour) 
 
 	if err	=	mgoDAO.UpdateStatsClassByCreated(review.ClassID, newStats); err != nil {
+		log.Println("Error in UpdateStatsClassByCreated DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -91,6 +112,7 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 	review.ID			=	bson.NewObjectId()
 
 	if err	:=	mgoDAO.Insert(review); err != nil {
+		log.Println("Error in Insert DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -103,11 +125,13 @@ func CreateReviewEndPoint(w http.ResponseWriter, r *http.Request) {
 func AllReviewsByClassIDEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	params			:=	mux.Vars(r)
+
 	page			:=	r.URL.Query().Get("page")
 	offset			:=	r.URL.Query().Get("offset")
-	reviews, err	:=	mgoDAO.FindReviewsByClassID(params["classid"], page, offset)
 
+	reviews, err	:=	mgoDAO.FindReviewsByClassID(params["classid"], page, offset)
 	if err	!=	nil {
+		log.Println("Error in FindReviewsByClassID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review classid")
 		return
 	}
@@ -121,9 +145,10 @@ func AllReviewsByClassIDEndPoint(w http.ResponseWriter, r *http.Request) {
 func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
 	
 	params		:=	mux.Vars(r)
-	review, err	:=	mgoDAO.FindByID(params["reviewid"])
 
+	review, err	:=	mgoDAO.FindByID(params["reviewid"])
 	if err	!=	nil {
+		log.Println("Error in FindByID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
 		return
 	}
@@ -141,6 +166,7 @@ func UpdateReportByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	updateAt	:=	time.Now().UTC().Add(7 * time.Hour)
 
 	if err	:=	mgoDAO.UpdateReportByID(params["reviewid"], updateAt); err != nil {
+		log.Println("Error in UpdateReportByID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review id")
 		return
 	}
@@ -157,6 +183,7 @@ func UpdateClapByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	iclap, _	:=	strconv.ParseUint(params["clap"],10 ,32)
 
 	if err	:=	mgoDAO.UpdateClapByID(params["reviewid"], iclap, updateAt); err != nil {
+		log.Println("Error in UpdateClapByID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -169,10 +196,12 @@ func UpdateClapByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 func UpdateBooByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	
 	params		:=	mux.Vars(r)
+	
 	updateAt	:=	time.Now().UTC().Add(7 * time.Hour)
-	iboo, _		:=	strconv.ParseUint(params["boo"],10, 32)
+	iboo, _		:=	strconv.ParseUint(params["boo"], 10, 32)
 	
 	if err	:=	mgoDAO.UpdateBooByID(params["reviewid"], iboo, updateAt); err != nil {
+		log.Println("Error in UpdateBooByID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -185,8 +214,8 @@ func UpdateBooByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 func AllReviewsEndPoint(w http.ResponseWriter, r *http.Request) {
 	
 	reviews, err	:=	mgoDAO.FindAll()
-	
 	if err	!=	nil {
+		log.Println("Error in FindAll DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -208,6 +237,7 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	review, err	:=	mgoDAO.FindReviewAllPropertyByID(params["reviewid"])
 	if err	!=	nil {
+		log.Println("Error in FindReviewAllPropertyByID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
 		return
 	}
@@ -217,6 +247,7 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 		// Delete the review.
 		class, err	=	mgoDAO.FindClassByClassID(review.ClassID)
 		if err	!=	nil {
+			log.Println("Error in FindClassByClassID DAO", err.Error())
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -238,22 +269,26 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 		newStats.UpdateAt	=	time.Now().UTC().Add(7 * time.Hour) 
 		
 		if err	:=	mgoDAO.DeleteByID(params["reviewid"]); err != nil {
+			log.Println("Error in DeleteByID DAO", err.Error())
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		if err	=	mgoDAO.UpdateStatsClassByDeleted(review.ClassID, newStats); err != nil {
+		log.Println("Error in UpdateStatsClassByDeleted DAO", err.Error())
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		// Delete recap on the review.
 		if err	:=	mgoDAO.DeleteRecapByID(review.RecapID); err != nil {
+			log.Println("Error in DeleteRecapByID DAO", err.Error())
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
 		if err	=	mgoDAO.UpdateNumberRecapByClassID(review.ClassID, -1); err != nil {
+			log.Println("Error in UpdateNumberRecapByClassID DAO", err.Error())
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -273,12 +308,15 @@ func CreateReportEndPoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	
 	if err	:=	json.NewDecoder(r.Body).Decode(&report); err != nil {
+		log.Println("Error in decoding body on request", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
 	updateAt	:=	time.Now().UTC().Add(7 * time.Hour)
+
 	if err	:=	mgoDAO.UpdateReportByID(report.ReviewID, updateAt); err != nil {
+		log.Println("Error in UpdateReportByID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review id")
 		return
 	}
@@ -286,6 +324,7 @@ func CreateReportEndPoint(w http.ResponseWriter, r *http.Request) {
 	report.CreatedAt	=	time.Now().UTC().Add(7 * time.Hour)
 
 	if err	:=	mgoDAO.InsertReport(report); err != nil {
+		log.Println("Error in InsertReport DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

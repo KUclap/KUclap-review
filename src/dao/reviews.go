@@ -63,7 +63,7 @@ func (m *SessionDAO) FindReviewsByClassID(classID string, page string, offset st
 }
 
 // LastReviews is Find last reviews range with offset
-func (m *SessionDAO) LastReviews(page string,offset string) ([]models.ResReview, error) {
+func (m *SessionDAO) LastReviews(page string,offset string, query bson.M) ([]models.ResReview, error) {
 	var reviews []models.ResReview
 
 	db	:=	session.Copy()
@@ -79,7 +79,7 @@ func (m *SessionDAO) LastReviews(page string,offset string) ([]models.ResReview,
 		log.Println("err : atoi.", err)
 	}
 	
-	err = db.DB(m.Database).C(COLLECTION_REVIEWS).Find(bson.M{}).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&reviews)
+	err = db.DB(m.Database).C(COLLECTION_REVIEWS).Find(query).Sort("-$natural").Skip(iPage * iOffset).Limit(iOffset).All(&reviews)
 
 	return reviews, err
 }
