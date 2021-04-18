@@ -75,16 +75,16 @@ type ReviewFilterField struct {
 	// length greater than filtering
 	ClapGte			*uint64			`schema:"clap_gte" bson:"clap" type:"length" operation:"$gte"`
 	BooGte			*uint64			`schema:"boo_gte" bson:"boo" type:"length" operation:"$gte"`
-	HowGte			*float64		`schema:"how_gte" bson:"how" type:"length" operation:"$gte"`
-	HomeworkGte		*float64		`schema:"homework_gte" bson:"homework" type:"length" operation:"$gte"`
-	InterestGte		*float64		`schema:"interest_gte" bson:"interest" type:"length" operation:"$gte"`
+	HowGte			*float64		`schema:"stat_how_gte" bson:"how" type:"length" operation:"$gte"`
+	HomeworkGte		*float64		`schema:"stat_homework_gte" bson:"homework" type:"length" operation:"$gte"`
+	InterestGte		*float64		`schema:"stat_interest_gte" bson:"interest" type:"length" operation:"$gte"`
 
 	// length less than filtering
 	ClapLte			*uint64			`schema:"clap_lte" bson:"clap" type:"length" operation:"$lte"`
 	BooLte			*uint64			`schema:"boo_lte" bson:"boo" type:"length" operation:"$lte"`
-	HowLte			*float64		`schema:"how_lte" bson:"how" type:"length" operation:"$lte"`
-	HomeworkLte		*float64		`schema:"homework_lte" bson:"homework" type:"length" operation:"$lte"`
-	InterestLte		*float64		`schema:"interest_lte" bson:"interest" type:"length" operation:"$lte"`
+	HowLte			*float64		`schema:"stat_how_lte" bson:"how" type:"length" operation:"$lte"`
+	HomeworkLte		*float64		`schema:"stat_homework_lte" bson:"homework" type:"length" operation:"$lte"`
+	InterestLte		*float64		`schema:"stat_interest_lte" bson:"interest" type:"length" operation:"$lte"`
 
 	// date greater than filtering
 	CreatedAtGte	*string			`schema:"created_at_gte" bson:"created_at" type:"date" operation:"$gte"`
