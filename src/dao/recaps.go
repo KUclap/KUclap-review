@@ -127,3 +127,13 @@ func (m *SessionDAO) DeleteRecapByID(recapID string) error {
 	
 	return err
 }
+
+// UpdateReportByID is Update reported
+func (m *SessionDAO) UpdateRecapReportByID(id string) error {
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_RECAPS).UpdateId(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"reported": true}})
+	
+	return err
+}

@@ -1,10 +1,12 @@
 package routes 
 
 import (
+	"log"
 	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
+
 	"kuclap-review-api/src/models"
 	"kuclap-review-api/src/helper"
 
@@ -23,6 +25,7 @@ func IndexQuestionsHandler(r *mux.Router) {
 	r.HandleFunc(prefixPath + "/{questionid}", FindQuestionEndpoint).Methods("GET")
 	r.HandleFunc(prefixPath + "/{questionid}", DeleteQuestionByIDEndPoint).Methods("DELETE")
 	r.HandleFunc("/questions", AllQuestionsEndPoint).Methods("GET")
+	r.HandleFunc(prefixPath + "/report", CreateQuestionReportEndPoint).Methods("POST")
 	// r.HandleFunc("/questions/reported", FindQuestionReportedEndpoint).Methods("GET")
 	// r.HandleFunc("/questions/{questionid}", UpdateQuestionEndPoint).Methods("PUT")
 }
@@ -57,7 +60,7 @@ func CreateQuestionEndPoint(w http.ResponseWriter, r *http.Request) {
 	question.CreatedAt		=	time.Now().UTC().Add(7 * time.Hour)
 	question.UpdateAt		=	question.CreatedAt
 	question.ID				=	bson.NewObjectId()
-	question.Answer			=	make([]models.Answer, 0)
+	// question.Answer			=	make([]models.Answer, 0)
 
 	if err	:=	mgoDAO.CreateQuestion(question); err != nil {
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
@@ -136,9 +139,11 @@ func AllQuestionsEndPoint(w http.ResponseWriter, r *http.Request) {
 func DeleteQuestionByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	params			:=	mux.Vars(r) 
+
 	reqToken		:=	r.Header.Get("Authorization")
 	splitToken		:=	strings.Split(reqToken, " ")
 	reqAuth			:=	splitToken[1]
+
 	question, err	:=	mgoDAO.FindQuestionAllPropertyByID(params["questionid"])
 
 	if err	!=	nil {
@@ -149,6 +154,11 @@ func DeleteQuestionByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	if question.Auth == reqAuth {
 		
 		if err	:=	mgoDAO.DeleteQuestionByID(params["questionid"]); err != nil {
+			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		if err	=	mgoDAO.DeleteAnswersByQuestionID(params["questionid"]); err != nil {
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -165,4 +175,36 @@ func DeleteQuestionByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	} else {
 		helper.RespondWithError(w, http.StatusInternalServerError, "your auth isn't match.")
 	}
+}
+
+// CreateQuestionReportEndPoint is POST create report for the review
+func CreateQuestionReportEndPoint(w http.ResponseWriter, r *http.Request) { 
+	
+	var report models.Report
+	defer r.Body.Close()
+	
+	if err	:=	json.NewDecoder(r.Body).Decode(&report); err != nil {
+		log.Println("Error in decoding body on request", err.Error())
+		helper.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	updateAt	:=	time.Now().UTC().Add(7 * time.Hour)
+
+	if err	:=	mgoDAO.UpdateQuestionReportByID(report.QuestionID, updateAt); err != nil {
+		log.Println("Error in UpdateReportByID DAO", err.Error())
+		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review id")
+		return
+	}
+
+	report.CreatedAt	=	time.Now().UTC().Add(7 * time.Hour)
+
+	if err	:=	mgoDAO.InsertReport(report); err != nil {
+		log.Println("Error in InsertReport DAO", err.Error())
+		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	helper.RespondWithJson(w, http.StatusCreated, report)
+	
 }

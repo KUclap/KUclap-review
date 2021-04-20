@@ -33,6 +33,8 @@ func IndexRecapHandler(r *mux.Router) {
 	r.HandleFunc(prefixPath + "/{recapid}", FindRecapEndpoint).Methods("GET")
 	r.HandleFunc(prefixPath + "/{recapid}", DeleteRecapByIDEndPoint).Methods("DELETE")
 	r.HandleFunc("/recaps", AllRecapsEndPoint).Methods("GET")
+	r.HandleFunc(prefixPath + "/report", CreateRecapReportEndPoint).Methods("POST")
+	
 
 }
 
@@ -263,4 +265,33 @@ func AllRecapsEndPoint(w http.ResponseWriter, r *http.Request){
 
 	helper.RespondWithJson(w, http.StatusOK, recaps)
 
+}
+
+func CreateRecapReportEndPoint(w http.ResponseWriter, r *http.Request) { 
+	
+	var report models.Report
+	defer r.Body.Close()
+	
+	if err	:=	json.NewDecoder(r.Body).Decode(&report); err != nil {
+		log.Println("Error in decoding body on request", err.Error())
+		helper.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	if err	:=	mgoDAO.UpdateRecapReportByID(report.RecapID); err != nil {
+		log.Println("Error in UpdateReportByID DAO", err.Error())
+		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review id")
+		return
+	}
+
+	report.CreatedAt	=	time.Now().UTC().Add(7 * time.Hour)
+
+	if err	:=	mgoDAO.InsertReport(report); err != nil {
+		log.Println("Error in InsertReport DAO", err.Error())
+		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	helper.RespondWithJson(w, http.StatusCreated, report)
+	
 }

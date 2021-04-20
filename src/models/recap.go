@@ -19,4 +19,5 @@ type Recap struct {
 	TypeFile		string			`json:"type" bson:"type"`
 	Tag				string			`json:"tag" bson:"tag"`
 	CreatedAt		time.Time		`json:"createdAt" bson:"created_at"`
+	Reported		bool			`json:"reported" bson:"reported"`
 }

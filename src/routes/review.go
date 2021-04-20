@@ -31,7 +31,7 @@ func IndexReviewHandler(r *mux.Router) {
 	r.HandleFunc(prefixPath + "/boo/{reviewid}/{boo}", UpdateBooByIDEndPoint).Methods("PUT")
 	r.HandleFunc(prefixPath + "/{reviewid}", DeleteReviewByIDEndPoint).Methods("DELETE")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
-	r.HandleFunc("/report", CreateReportEndPoint).Methods("POST")
+	r.HandleFunc(prefixPath + "/report", CreateReviewReportEndPoint).Methods("POST")
 	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
 	// r.HandleFunc("/reviews/{reviewid}", UpdateReviewEndPoint).Methods("PUT")
 
@@ -302,7 +302,7 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateReportEndPoint is POST create report for the review
-func CreateReportEndPoint(w http.ResponseWriter, r *http.Request) { 
+func CreateReviewReportEndPoint(w http.ResponseWriter, r *http.Request) { 
 	
 	var report models.Report
 	defer r.Body.Close()
