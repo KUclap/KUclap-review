@@ -6,7 +6,7 @@ ARG GIT_ACCESS_TOKEN_CURL_CONFIG=${GIT_ACCESS_TOKEN_CURL_CONFIG}
 COPY . .
 
 RUN go mod download
-RUN curl -o config.toml https://${GIT_ACCESS_TOKEN_CURL_CONFIG}@https://raw.githubusercontent.com/KUclap/_ENV/main/env/kuclap-review-api/config.toml
+RUN curl -o config.toml https://${GIT_ACCESS_TOKEN_CURL_CONFIG}@raw.githubusercontent.com/KUclap/_ENV/main/env/kuclap-review-api/config.toml
 RUN mv config.toml config
 
 # RUN env GOOS=darwin GOARCH=arm64 go build -mod=readonly -o ./kuclap-review-api -v .
