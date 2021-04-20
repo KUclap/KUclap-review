@@ -86,26 +86,26 @@ func (m *SessionDAO) LastQuestions(page string, offset string) ([]models.ResQues
 	return questions, err
 }
 
-// FindQuestionByID is Find question by question_id
+// FindQuestionByID is Find question by _id
 func (m *SessionDAO) FindQuestionByID(questionID string) (models.ResQuestion, error) {
 	var question models.ResQuestion
 
 	db	:=	session.Copy()
 	defer db.Close()
 	
-	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"question_id": bson.ObjectIdHex(questionID) }).One(&question)
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"_id": bson.ObjectIdHex(questionID) }).One(&question)
 	
 	return question, err
 }
 
-// FindQuestionAllPropertyByID is Find question by question_id
+// FindQuestionAllPropertyByID is Find question by _id
 func (m *SessionDAO) FindQuestionAllPropertyByID(questionID string) (models.Question, error) {
 	var question models.Question
 
 	db	:=	session.Copy()
 	defer db.Close()
 	
-	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"question_id": bson.ObjectIdHex(questionID) }).One(&question)
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Find(bson.M{"_id": bson.ObjectIdHex(questionID) }).One(&question)
 	
 	return question, err
 }
@@ -115,7 +115,17 @@ func (m *SessionDAO) DeleteQuestionByID(questionID string) error {
 	db	:=	session.Copy()
 	defer db.Close()
 
-	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Remove(bson.M{"question_id": bson.ObjectIdHex(questionID)})
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).Remove(bson.M{"_id": bson.ObjectIdHex(questionID)})
+	
+	return err
+}
+
+// UpdateQuestionReportByID is Update reported
+func (m *SessionDAO) UpdateQuestionReportByID(id string, updateAt time.Time) error {
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_QUESTION).UpdateId(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"reported": true, "update_at": updateAt}})
 	
 	return err
 }

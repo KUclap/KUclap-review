@@ -13,6 +13,7 @@ const (
 	COLLECTION_CLASSES	=	"classes"
 	COLLECTION_REPORTS	=	"reported"
 	COLLECTION_QUESTION	=	"questions"
+	COLLECTION_ANSWERS	=	"answers"
 	COLLECTION_RECAPS	=	"recaps"
 )
 
