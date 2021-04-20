@@ -29,6 +29,7 @@ type ResQuestion struct {
 	Author			string			`json:"author,omitempty" bson:"author"`
 	ClassNameTH		string			`json:"classNameTH" bson:"class_name_th"`
 	ClassNameEN		string			`json:"classNameEN" bson:"class_name_en"`
+	NumberAnswer	uint64			`json:"numberAnswer" bson:"number_answers"`
 	CreatedAt		time.Time		`json:"createdAt" bson:"created_at"`
 	UpdateAt		time.Time		`json:"updateAt" bson:"update_at"`
 }
