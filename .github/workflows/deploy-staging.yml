@@ -15,7 +15,7 @@ jobs:
                   heroku_api_key: ${{secrets.HEROKU_API_KEY}}
                   heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
                   heroku_email: ${{secrets.HEROKU_EMAIL}}
-                  docker_heroku_process_type: 'web  --recursive --context-path .'
+                  #   docker_heroku_process_type: 'web  --recursive --context-path .'
                   usedocker: true
                   docker_build_args: |
                       GIT_ACCESS_TOKEN_CURL_CONFIG
