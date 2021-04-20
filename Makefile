@@ -40,7 +40,8 @@ heroku-container-login:
 # 	heroku container:push ${DYNO} --app ${APP_PROD} && heroku container:release ${DYNO} --app ${APP_PROD}
 
 cp-cr-staging:
-	heroku container:push ${DYNO} --recursive --context-path . --app ${APP_STAGING} && heroku container:release ${DYNO} --app ${APP_STAGING}
+	heroku container:push ${DYNO} --app ${APP_STAGING} && heroku container:release ${DYNO} --app ${APP_STAGING}
+# heroku container:push ${DYNO} --recursive --context-path . --app ${APP_STAGING} && heroku container:release ${DYNO} --app ${APP_STAGING}
 # NOTE: Dockerfile's name should starting with 'D' capital letter, then use --recursive optional for recursive search the image file and use context-path optional for building context on root.
 
 ### Load Testing 
