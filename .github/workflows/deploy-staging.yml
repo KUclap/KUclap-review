@@ -9,10 +9,28 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
-            - uses: akhileshns/heroku-deploy@v3.8.9 # This is the action
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Build, Push and Deploy to Heroku # set whatever name you want to this step
+              id: heroku
+              uses: jctaveras/heroku-deploy@v1.0.0 # use the latest version of the action
               with:
-                  heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-                  heroku_app_name: kuclap-api-staging
-                  heroku_email: ${{secrets.HEROKU_EMAIL}}
-                  usedocker: true
+                  email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
+                  api_key: ${{ secrets.HEROKU_API_KEY }} # your heroku api key
+                  app_name: ${{ secrets.HEROKU_APP_NAME }} # you aplication name
+                  dockerfile_path: './docker' # set the path to the folder where the Dockerfile is located
+                  options: '--build-arg GIT_ACCESS_TOKEN_CURL_CONFIG=${{secrets.GIT_ACCESS_TOKEN_CURL_CONFIG}}' # Docker Build Options
+
+
+        # steps:
+        #     - uses: actions/checkout@v2
+        #     - uses: akhileshns/heroku-deploy@v3.8.9 # This is the action
+        #       with:
+        #           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        #           heroku_app_name: kuclap-api-staging
+        #           heroku_email: ${{secrets.HEROKU_EMAIL}}
+        #           usedocker: true
+        #           docker_build_args: |
+        #               GIT_ACCESS_TOKEN_CURL_CONFIG
+        #       env:
+        #           GIT_ACCESS_TOKEN_CURL_CONFIG: ${{secrets.GIT_ACCESS_TOKEN_CURL_CONFIG}}
