@@ -16,7 +16,5 @@ jobs:
                   heroku_app_name: kuclap-api-staging
                   heroku_email: ${{secrets.HEROKU_EMAIL}}
                   usedocker: true
-                  docker_build_args: |
-                      GIT_ACCESS_TOKEN_CURL_CONFIG
               env:
                   GIT_ACCESS_TOKEN_CURL_CONFIG: ${{secrets.GIT_ACCESS_TOKEN_CURL_CONFIG}}
