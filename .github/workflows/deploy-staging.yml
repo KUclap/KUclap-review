@@ -18,7 +18,7 @@ jobs:
                   email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
                   api_key: ${{ secrets.HEROKU_API_KEY }} # your heroku api key
                   app_name: ${{ secrets.HEROKU_APP_NAME }} # you aplication name
-                  dockerfile_path: 'docker' # set the path to the folder where the Dockerfile is located
+                  dockerfile_path: './docker/Dockerfile.web' # set the path to the folder where the Dockerfile is located
                   options: '--build-arg GIT_ACCESS_TOKEN_CURL_CONFIG=${{secrets.GIT_ACCESS_TOKEN_CURL_CONFIG}}' # Docker Build Options
 
 
