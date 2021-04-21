@@ -51,6 +51,8 @@ git clone https://github.com/KUclap/KUclap-review.git
 
 ```sh
 go get ./...
+# or
+go mod download
 ```
 
 <!-- USAGE EXAMPLES -->
