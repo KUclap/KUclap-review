@@ -48,8 +48,7 @@ func (m *SessionDAO) FindLastAnswersByQuestionID(questionId string) ([]models.Re
 	db	:=	session.Copy()
 	defer db.Close()
 	
-	
-	err	:=	db.DB(m.Database).C(COLLECTION_ANSWERS).Find(bson.M{"question_id": questionId}).Sort("-$natural").All(&answers)
+	err	:=	db.DB(m.Database).C(COLLECTION_ANSWERS).Find(bson.M{"question_id": questionId}).All(&answers)
 	return answers, err
 }
 
