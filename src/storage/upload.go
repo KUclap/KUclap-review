@@ -31,7 +31,7 @@ func PresignedURLUploadRecapS3(class *models.Class, author string, recapID strin
 
 	if err != nil {
 		log.Println("[ERR] aws configuration error", err)
-		panic("configuration error, " + err.Error())
+		return PresignedResponse{}, err
 	}
 
 	client			:=	s3.NewFromConfig(cfg)
@@ -52,6 +52,11 @@ func PresignedURLUploadRecapS3(class *models.Class, author string, recapID strin
 
 	pressignedClient	:=	s3.NewPresignClient(client)
 	presigned, err		:=	pressignedClient.PresignPutObject(context.TODO(), input)
+
+	if err != nil {
+		log.Println("[ERR] aws PresignPutObject error", err)
+		return PresignedResponse{}, err
+	}
 
 	payload	:=	PresignedResponse{
 		Url:		presigned.URL,
