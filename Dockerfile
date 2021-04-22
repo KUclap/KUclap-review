@@ -2,6 +2,8 @@ FROM golang:1.16-buster as builder
 WORKDIR /go/src/github.com/KUclap/KUclap-review
 
 ARG GIT_ACCESS_TOKEN_CURL_CONFIG
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
 
 COPY . .
 
@@ -28,6 +30,8 @@ COPY --from=builder /go/src/github.com/KUclap/KUclap-review/config config/
 ENV GO111MODULE=on
 ENV PORT=${PORT}
 ENV KIND=staging
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 
 EXPOSE 8000
 

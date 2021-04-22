@@ -1,6 +1,8 @@
 FROM golang:1.15
 
 ARG GIT_ACCESS_TOKEN_CURL_CONFIG
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
 
 COPY . /go/src/github.com/KUclap/KUclap-review
 WORKDIR /go/src/github.com/KUclap/KUclap-review
@@ -11,6 +13,9 @@ RUN go get ./...
 RUN go build -o ./builder/kuclap-review-api .
 
 ENV KIND=preproduction 
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+
 CMD ["./builder/kuclap-review-api"]
 
 EXPOSE 8089
