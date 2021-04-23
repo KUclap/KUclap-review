@@ -40,8 +40,8 @@ func (m *SessionDAO) UpdateNumberRecapByClassID(classID string, number int) erro
 }
 
 // FindAllRecaps is Find All of list of recap 
-func (m *SessionDAO) FindAllRecaps() ([]models.Recap, error) {
-	var recaps []models.Recap
+func (m *SessionDAO) FindAllRecaps() ([]models.ResRecap, error) {
+	var recaps []models.ResRecap
 
 	db	:=	session.Copy()
 	defer db.Close()
@@ -51,8 +51,8 @@ func (m *SessionDAO) FindAllRecaps() ([]models.Recap, error) {
 }
 
 // FindRecapsByClassID is Find recap by class_id
-func (m *SessionDAO) FindRecapsByClassID(classID string, page string, offset string) ([]models.Recap, error) {
-	var recaps []models.Recap
+func (m *SessionDAO) FindRecapsByClassID(classID string, page string, offset string) ([]models.ResRecap, error) {
+	var recaps []models.ResRecap
 
 	db := session.Copy()
 	defer db.Close()
@@ -73,8 +73,8 @@ func (m *SessionDAO) FindRecapsByClassID(classID string, page string, offset str
 }
 
 // LastRecaps is Find last recaps range with offset
-func (m *SessionDAO) LastRecaps(page string, offset string) ([]models.Recap, error) {
-	var recaps []models.Recap
+func (m *SessionDAO) LastRecaps(page string, offset string) ([]models.ResRecap, error) {
+	var recaps []models.ResRecap
 
 	db	:=	session.Copy()
 	defer db.Close()
@@ -95,8 +95,8 @@ func (m *SessionDAO) LastRecaps(page string, offset string) ([]models.Recap, err
 }
 
 // FindRecapByID is Find recap by recap_id
-func (m *SessionDAO) FindRecapByID(recapID string) (models.Recap, error) {
-	var recap models.Recap
+func (m *SessionDAO) FindRecapByID(recapID string) (models.ResRecap, error) {
+	var recap models.ResRecap
 
 	db	:=	session.Copy()
 	defer db.Close()
