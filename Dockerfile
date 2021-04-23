@@ -4,6 +4,7 @@ WORKDIR /go/src/github.com/KUclap/KUclap-review
 ARG GIT_ACCESS_TOKEN_CURL_CONFIG
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_DEFAULT_REGION
 
 COPY . .
 
@@ -28,10 +29,13 @@ COPY --from=builder /go/src/github.com/KUclap/KUclap-review/kuclap-review-api .
 COPY --from=builder /go/src/github.com/KUclap/KUclap-review/config config/
 
 ENV GO111MODULE=on
+
 ENV PORT=${PORT}
 ENV KIND=staging
+
 ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
 ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+ENV AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
 
 EXPOSE 8000
 
