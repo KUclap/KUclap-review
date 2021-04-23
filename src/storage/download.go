@@ -21,7 +21,7 @@ func GetDownloadPresignedURL(c context.Context, api S3PresignGetObjectAPI, input
 	return api.PresignGetObject(c, input)
 }
 
-func PresignedURLDownloadRecapS3(recap *models.Recap) (string, error) {
+func PresignedURLDownloadRecapS3(recap *models.ResRecap) (string, error) {
 
 	cfg, err		:=	config.LoadDefaultConfig(context.TODO())
 
