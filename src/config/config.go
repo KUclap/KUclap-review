@@ -11,6 +11,7 @@ type Configuration struct {
 	OriginAllowed	[]string
 	Server			string
 	Database		string
+	BucketName		string
 }
 
 type Config struct {

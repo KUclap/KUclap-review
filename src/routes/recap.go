@@ -35,7 +35,6 @@ func IndexRecapHandler(r *mux.Router) {
 	r.HandleFunc("/recaps", AllRecapsEndPoint).Methods("GET")
 	r.HandleFunc(prefixPath + "/report", CreateRecapReportEndPoint).Methods("POST")
 	
-
 }
 
 func PresignedDownloadRecapEndPoint(w http.ResponseWriter, r *http.Request) {

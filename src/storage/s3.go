@@ -1,7 +1,18 @@
 package storage
 
-const (
-	BUCKET_NAME			=	"kuclap-recap-storage"
-	RECAP_FOLDER		=	"recap/"
-	LIMIT_FILE_SIZE		=	20480	// 1024 * 20 = 20 MB
+import (
+	"kuclap-review-api/src/constant"
 )
+
+
+var (
+	BUCKET_NAME			string
+	RECAP_FOLDER		string
+	LIMIT_FILE_SIZE		int64
+)
+
+func init() {
+	BUCKET_NAME			=	constant.BUCKET_NAME
+	RECAP_FOLDER		=	constant.RECAP_FOLDER
+	LIMIT_FILE_SIZE		=	constant.LIMIT_FILE_SIZE
+}

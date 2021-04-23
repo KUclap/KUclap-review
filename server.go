@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"fmt"
 	
-    "kuclap-review-api/src/config"
+	"kuclap-review-api/src/config"
 	"kuclap-review-api/src/middleware"
 	"kuclap-review-api/src/routes"
 	"kuclap-review-api/src/dao"
@@ -19,9 +19,10 @@ var (
 	KIND			string
 	PORT			string
 	ORIGIN			[]string
+	serverConfig	config.Config
 	configuration	config.Configuration
 	mgoDAO			dao.SessionDAO
-	serverConfig	config.Config
+
 )
 
 func Healthcheck(w http.ResponseWriter, r *http.Request) {
@@ -32,8 +33,8 @@ func init() {
 	log.Println("Initial service... 🔧") 
 	
 	serverConfig.Read()
-	
 	configuration	=	serverConfig.GetConfig()
+
 	KIND			=	configuration.Kind
 	ORIGIN			=	configuration.OriginAllowed
 	mgoDAO.Server	=	configuration.Server
