@@ -27,7 +27,7 @@ type PresignedResponse struct {
 
 func PresignedURLUploadRecapS3(class *models.Class, author string, recapID string) (PresignedResponse, error) {
 
-	cfg, err		:=	config.LoadDefaultConfig(context.TODO(), config.WithRegion("ap-southeast-1"))
+	cfg, err		:=	config.LoadDefaultConfig(context.TODO())
 
 	if err != nil {
 		log.Println("[ERR] aws configuration error", err)
