@@ -182,6 +182,10 @@ func UpdateClapByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	updateAt	:=	time.Now().UTC().Add(7 * time.Hour)
 	iclap, _	:=	strconv.ParseUint(params["clap"],10 ,32)
 
+	if iclap > 25 {
+		iclap = 25
+	}
+
 	if err	:=	mgoDAO.UpdateClapByID(params["reviewid"], iclap, updateAt); err != nil {
 		log.Println("Error in UpdateClapByID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
@@ -199,6 +203,10 @@ func UpdateBooByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	
 	updateAt	:=	time.Now().UTC().Add(7 * time.Hour)
 	iboo, _		:=	strconv.ParseUint(params["boo"], 10, 32)
+
+	if iboo > 25 {
+		iboo = 25
+	}
 	
 	if err	:=	mgoDAO.UpdateBooByID(params["reviewid"], iboo, updateAt); err != nil {
 		log.Println("Error in UpdateBooByID DAO", err.Error())
