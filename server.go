@@ -70,7 +70,7 @@ func main() {
 	log.Println("Running on " + KIND + " Mode 🌶")	
 	log.Println("Server listening on port " + PORT + " 🚀")
 
-	if err	:=	http.ListenAndServe(":" + PORT, middleware.LimitMiddleware(handlers.CORS(headersOk, exposeOk, originsOk, methodsOk)(r))); err != nil {
+	if err	:=	http.ListenAndServe(":" + PORT, middleware.LimitMiddleware(handlers.CompressHandler(handlers.CORS(headersOk, exposeOk, originsOk, methodsOk)(r)))); err != nil {
 		log.Fatal(err)
 	}	
 }
