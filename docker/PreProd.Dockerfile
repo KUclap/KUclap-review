@@ -11,7 +11,7 @@ COPY . .
 RUN curl -o config.toml https://${GIT_ACCESS_TOKEN_CURL_CONFIG}@raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml
 RUN mv config.toml ./config/config.toml
 
-RUN go mode download
+RUN go mod download
 RUN go build -v -o ./kuclap-review-api
 
 ################
