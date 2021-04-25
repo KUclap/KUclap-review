@@ -2,9 +2,6 @@ FROM golang:1.16-buster as builder
 WORKDIR /go/src/github.com/KUclap/KUclap-review
 
 ARG GIT_ACCESS_TOKEN_CURL_CONFIG
-ARG ARG_AWS_ACCESS_KEY_ID
-ARG ARG_AWS_SECRET_ACCESS_KEY
-ARG ARG_AWS_DEFAULT_REGION
 
 COPY . .
 
@@ -20,6 +17,10 @@ RUN go build  -mod=readonly -v -o ./kuclap-review-api
 
 FROM debian:buster-slim
 WORKDIR /go/src/github.com/KUclap/KUclap-review
+
+ARG ARG_AWS_ACCESS_KEY_ID
+ARG ARG_AWS_SECRET_ACCESS_KEY
+ARG ARG_AWS_DEFAULT_REGION
 
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     ca-certificates && \
