@@ -36,7 +36,7 @@ ENV AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
 
 EXPOSE 8089
 
-CMD /kuclap-review-api
+CMD ./kuclap-review-api
 
 # FROM golang:1.15
 
