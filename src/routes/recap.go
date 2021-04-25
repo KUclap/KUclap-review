@@ -207,42 +207,43 @@ func DeleteRecapByIDEndPoint(w http.ResponseWriter, r *http.Request){
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		if recap.ReviewID != "" {
+			// Delete review that storing the recap.
+			review, err	:=	mgoDAO.FindReviewAllPropertyByID(recap.ReviewID)
+			if err	!=	nil {
+				helper.RespondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
+				return
+			}
+			
+			class, err	:=	mgoDAO.FindClassByClassID(recap.ClassID)
+			if err	!=	nil {
+				helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
 
-		// Delete review that storing the recap.
-		review, err	:=	mgoDAO.FindReviewAllPropertyByID(recap.ReviewID)
-		if err	!=	nil {
-			helper.RespondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
-			return
-		}
-		
-		class, err	:=	mgoDAO.FindClassByClassID(recap.ClassID)
-		if err	!=	nil {
-			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
+			var newStats	models.StatClass
+			var oldStats =	class.Stats
 
-		var newStats	models.StatClass
-		var oldStats =	class.Stats
+			if class.NumberReviewer ==  1 {
+				// Ignore NaN when we divide with zero
+				newStats.How		=	0
+				newStats.Homework	=	0
+				newStats.Interest	=	0
+			} else {
+				newStats.How		=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
+				newStats.Homework	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Homework,  review.Stats.Homework)
+				newStats.Interest	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
+			}
+			
+			if err	:=	mgoDAO.DeleteByID(recap.ReviewID); err != nil {
+				helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
 
-		if class.NumberReviewer ==  1 {
-			// Ignore NaN when we divide with zero
-			newStats.How		=	0
-			newStats.Homework	=	0
-			newStats.Interest	=	0
-		} else {
-			newStats.How		=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
-			newStats.Homework	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Homework,  review.Stats.Homework)
-			newStats.Interest	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
-		}
-		
-		if err	:=	mgoDAO.DeleteByID(recap.ReviewID); err != nil {
-			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		if err	=	mgoDAO.UpdateStatsClassByDeleted(recap.ClassID, newStats); err != nil {
-			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
-			return
+			if err	=	mgoDAO.UpdateStatsClassByDeleted(recap.ClassID, newStats); err != nil {
+				helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
 		}
 
 		helper.RespondWithJson(w, http.StatusOK, map[string]string{"result": "success"})

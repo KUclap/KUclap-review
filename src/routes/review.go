@@ -287,19 +287,24 @@ func DeleteReviewByIDEndPoint(w http.ResponseWriter, r *http.Request) {
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
+		
+		
 
-		// Delete recap on the review.
-		if err	:=	mgoDAO.DeleteRecapByID(review.RecapID); err != nil {
-			log.Println("Error in DeleteRecapByID DAO", err.Error())
-			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
+		if review.RecapID != "" {
+				// Delete recap on the review.
+			if err	:=	mgoDAO.DeleteRecapByID(review.RecapID); err != nil {
+				log.Println("Error in DeleteRecapByID DAO", err.Error())
+				helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
 
-		if err	=	mgoDAO.UpdateNumberRecapByClassID(review.ClassID, -1); err != nil {
-			log.Println("Error in UpdateNumberRecapByClassID DAO", err.Error())
-			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
-			return
+			if err	=	mgoDAO.UpdateNumberRecapByClassID(review.ClassID, -1); err != nil {
+				log.Println("Error in UpdateNumberRecapByClassID DAO", err.Error())
+				helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
 		}
+		
 
 		helper.RespondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 
