@@ -14,9 +14,9 @@ jobs:
               uses: elgohr/Publish-Docker-Github-Action@master
               env:
                   GIT_ACCESS_TOKEN_CURL_CONFIG: ${{ secrets.GIT_ACCESS_TOKEN_CURL_CONFIG }}
-                  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-                  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-                  AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
+                  ARG_AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+                  ARG_AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+                  ARG_AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
               with:
                   name: kuclap/kuclap-review/kuclap-pre-prod-review-api
                   registry: docker.pkg.github.com
@@ -24,7 +24,7 @@ jobs:
                   password: ${{ secrets.GITHUB_TOKEN }}
                   dockerfile: ./docker/PreProd.Dockerfile
                   tags: '1.0.0, latest'
-                  buildargs: GIT_ACCESS_TOKEN_CURL_CONFIG, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_DEFAULT_REGION
+                  buildargs: GIT_ACCESS_TOKEN_CURL_CONFIG, ARG_AWS_ACCESS_KEY_ID, ARG_AWS_SECRET_ACCESS_KEY, ARG_AWS_DEFAULT_REGION
             - name: Deploy package to digitalocean
               uses: appleboy/ssh-action@master
               env:
