@@ -24,7 +24,7 @@ jobs:
                   password: ${{ secrets.GITHUB_TOKEN }}
                   dockerfile: ./docker/PreProd.Dockerfile
                   tags: '1.0.0, latest'
-                  buildargs: GIT_ACCESS_TOKEN_CURL_CONFIG, ARG_AWS_ACCESS_KEY_ID, ARG_AWS_SECRET_ACCESS_KEY, ARG_AWS_DEFAULT_REGION
+                  buildargs: GIT_ACCESS_TOKEN_CURL_CONFIG,ARG_AWS_ACCESS_KEY_ID,ARG_AWS_SECRET_ACCESS_KEY,ARG_AWS_DEFAULT_REGION
             - name: Deploy package to digitalocean
               uses: appleboy/ssh-action@master
               env:
