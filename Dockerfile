@@ -9,7 +9,7 @@ ARG AWS_DEFAULT_REGION
 COPY . .
 
 RUN go mod download
-RUN curl -o config.toml https://${GIT_ACCESS_TOKEN_CURL_CONFIG}@raw.githubusercontent.com/KUclap/_ENV/main/env/kuclap-review-api/config.toml
+RUN curl -o config.toml https://${GIT_ACCESS_TOKEN_CURL_CONFIG}@raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml
 
 
 RUN mv config.toml ./config/config.toml

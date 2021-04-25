@@ -1,4 +1,3 @@
-# --platform=linux/amd64
 FROM golang:1.16-buster as builder
 WORKDIR /go/src/github.com/KUclap/KUclap-review
 
@@ -37,7 +36,7 @@ ENV AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
 
 EXPOSE 8089
 
-CMD ["./kuclap-review-api"]
+CMD /kuclap-review-api
 
 # FROM golang:1.15
 
