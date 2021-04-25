@@ -28,11 +28,13 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 COPY --from=builder /go/src/github.com/KUclap/KUclap-review/kuclap-review-api .
 COPY --from=builder /go/src/github.com/KUclap/KUclap-review/config config/
 
+RUN echo "${ARG_AWS_ACCESS_KEY_ID} ${ARG_AWS_SECRET_ACCESS_KEY} ${ARG_AWS_DEFAULT_REGION}" >> ENVFILE.txt
+
 ENV GO111MODULE=on
 ENV KIND=preproduction
-ENV AWS_ACCESS_KEY_ID=${ARG_AWS_ACCESS_KEY_ID}
-ENV AWS_SECRET_ACCESS_KEY=${ARG_AWS_SECRET_ACCESS_KEY}
-ENV AWS_DEFAULT_REGION=${ARG_AWS_DEFAULT_REGION}
+ENV AWS_ACCESS_KEY_ID ${ARG_AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY ${ARG_AWS_SECRET_ACCESS_KEY}
+ENV AWS_DEFAULT_REGION ${ARG_AWS_DEFAULT_REGION}
 
 EXPOSE 8089
 
