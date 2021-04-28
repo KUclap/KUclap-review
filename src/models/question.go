@@ -13,6 +13,7 @@ type Question struct {
 	Question		string			`json:"question" bson:"question"`
 	Author			string			`json:"author,omitempty" bson:"author"`
 	Auth			string			`json:"auth,omitempty" bson:"auth"`
+	DeleteReason	string			`json:"deleteReason" bson:"delete_reason"`
 	ClassNameTH		string			`json:"classNameTH" bson:"class_name_th"`
 	ClassNameEN		string			`json:"classNameEN" bson:"class_name_en"`
 	NumberAnswer	uint64			`json:"numberAnswer" bson:"number_answers"`
@@ -27,11 +28,13 @@ type ResQuestion struct {
 	ClassID			string			`json:"classId" bson:"class_id"`
 	Question		string			`json:"question" bson:"question"`
 	Author			string			`json:"author,omitempty" bson:"author"`
+	DeleteReason	string			`json:"deleteReason" bson:"delete_reason"`
 	ClassNameTH		string			`json:"classNameTH" bson:"class_name_th"`
 	ClassNameEN		string			`json:"classNameEN" bson:"class_name_en"`
 	NumberAnswer	uint64			`json:"numberAnswer" bson:"number_answers"`
 	CreatedAt		time.Time		`json:"createdAt" bson:"created_at"`
 	UpdateAt		time.Time		`json:"updateAt" bson:"update_at"`
+	Reported		bool			`json:"reported" bson:"reported"`
 }
 
 // // GetBSON is function for filling default value when save value on mongo

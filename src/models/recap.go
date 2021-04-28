@@ -16,6 +16,7 @@ type Recap struct {
 	Description		string			`json:"description" bson:"description"`
 	Author			string			`json:"author" bson:"author"`
 	Auth			string			`json:"auth" bson:"auth"`
+	DeleteReason	string			`json:"deleteReason" bson:"delete_reason"`
 	TypeFile		string			`json:"type" bson:"type"`
 	Tag				string			`json:"tag" bson:"tag"`
 	ClassNameTH		string			`json:"classNameTH" bson:"class_name_th"`
@@ -32,6 +33,7 @@ type ResRecap struct {
 	Donwloaded		uint64			`json:"downloaded" bson:"downloaded"`
 	Description		string			`json:"description" bson:"description"`
 	Author			string			`json:"author" bson:"author"`
+	DeleteReason	string			`json:"deleteReason" bson:"delete_reason"`
 	TypeFile		string			`json:"type" bson:"type"`
 	Tag				string			`json:"tag" bson:"tag"`
 	ClassNameTH		string			`json:"classNameTH" bson:"class_name_th"`

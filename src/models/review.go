@@ -14,6 +14,7 @@ type Review struct {
 	Author			string			`json:"author" bson:"author"`
 	Grade			string			`json:"grade" bson:"grade"`
 	Auth			string			`json:"auth,omitempty" bson:"auth"`
+	DeleteReason	string			`json:"deleteReason" bson:"delete_reason"`
 	Clap			uint64			`json:"clap" bson:"clap"`
 	Boo				uint64			`json:"boo" bson:"boo"`
 	Stats			StatReview		`json:"stats" bson:"stats"`	
@@ -41,6 +42,7 @@ type ResReview struct {
 	ClassID			string			`json:"classId" bson:"class_id"`
 	Text			string			`json:"text" bson:"text"`
 	Author			string			`json:"author" bson:"author"`
+	DeleteReason	string			`json:"deleteReason" bson:"delete_reason"`
 	Grade			string			`json:"grade" bson:"grade"`
 	Clap			uint64			`json:"clap" bson:"clap"`
 	Boo				uint64			`json:"boo" bson:"boo"`
