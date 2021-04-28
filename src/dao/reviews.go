@@ -40,6 +40,16 @@ func (m *SessionDAO) UpdateReportByID(id string, updateAt time.Time) error {
 	return err
 }
 
+// UpdateAdminDeleteByID is Update reported
+func (m *SessionDAO) UpdateAdminDeleteByID(id string, deleteReason string, updateAt time.Time) error {
+	db	:=	session.Copy()
+	defer db.Close()
+	
+	err	:=	db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"delete_reason": deleteReason, "update_at": updateAt}})
+	
+	return err
+}
+
 // FindReviewsByClassID is Find reviews by class_id
 func (m *SessionDAO) FindReviewsByClassID(classID string, page string, offset string) ([]models.ResReview, error) {
 	var reviews []models.ResReview
@@ -137,6 +147,16 @@ func (m *SessionDAO) DeleteByID(id string) error {
 	return err
 }
 
+// Update an existing review
+// func (m *SessionDAO) Update(review models.Review) error {
+// 	db	:=	session.Copy()
+// 	defer db.Close()
+
+// 	err := db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(review.ID, &review)
+	
+// 	return err
+// }
+
 // Find reviews reported
 // func (m *SessionDAO) FindReviewsReported() ([]models.Review, error) {
 // 	var reviews []models.Review
@@ -144,8 +164,3 @@ func (m *SessionDAO) DeleteByID(id string) error {
 // 	return reviews, err
 // }
 
-// Update an existing review
-// func (m *SessionDAO) Update(review models.Review) error {
-// 	err := db.DB(m.Database).C(COLLECTION_REVIEWS).UpdateId(review.ID, &review)
-// 	return err
-// }

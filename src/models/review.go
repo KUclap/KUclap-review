@@ -115,6 +115,10 @@ func (review *ResReview) SetBSON(raw bson.Raw) (err error) {
 	review.Stats.Homework	=	review.Stats.Homework * 20
 	review.Stats.Interest	=	review.Stats.Interest * 20
 
+	if review.DeleteReason	!=	"" {
+		review.Text = ""
+	}
+
 	return
 	
 }

@@ -64,6 +64,7 @@ func main() {
 	routes.IndexQuestionsHandler(r)
 	routes.IndexAnswersHandler(r)
 	routes.IndexRecapHandler(r)
+	routes.IndexAdminHandler(r)
 
 	r.HandleFunc("/healthcheck", Healthcheck).Methods("GET")
 

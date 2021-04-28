@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 	"log"
-	// "fmt"
 	
 	"kuclap-review-api/src/models"
 	"kuclap-review-api/src/helper"
@@ -32,6 +31,7 @@ func IndexReviewHandler(r *mux.Router) {
 	r.HandleFunc(prefixPath + "/{reviewid}", DeleteReviewByIDEndPoint).Methods("DELETE")
 	r.HandleFunc("/reviews", AllReviewsEndPoint).Methods("GET")
 	r.HandleFunc(prefixPath + "/report", CreateReviewReportEndPoint).Methods("POST")
+	
 	// r.HandleFunc("/reviews/reported", FindReviewReportedEndpoint).Methods("GET")
 	// r.HandleFunc("/reviews/{reviewid}", UpdateReviewEndPoint).Methods("PUT")
 
@@ -139,7 +139,6 @@ func AllReviewsByClassIDEndPoint(w http.ResponseWriter, r *http.Request) {
 	helper.RespondWithJson(w, http.StatusOK, reviews)
 
 }
-
 
 // FindReviewEndpoint is GET a review by its ID
 func FindReviewEndpoint(w http.ResponseWriter, r *http.Request) {
