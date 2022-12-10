@@ -2,3 +2,4 @@ tmp/*
 .env
 config/config.toml
 builder
+.vscode
