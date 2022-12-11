@@ -9,18 +9,15 @@ ARG AWS_DEFAULT_REGION
 COPY . .
 
 RUN go mod download
+
 RUN curl -o config.toml https://${GIT_ACCESS_TOKEN_CURL_CONFIG_KUCLAP_API_REVIEW}@raw.githubusercontent.com/KUclap/_ENV/main/config/kuclap-review-api/config.toml
-
-
 RUN mv config.toml ./config/config.toml
 
-# RUN env GOOS=darwin GOARCH=arm64 go build -mod=readonly -o ./kuclap-review-api -v .
-# RUN env GOOS=darwin GOARCH=arm go build -mod=readonly -o ./kuclap-review-api -v .
 RUN go build -mod=readonly -v -o ./kuclap-review-api
 
 FROM debian:buster-slim
-# FROM golang:1.16-buster
 WORKDIR /go/src/github.com/KUclap/KUclap-review
+
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     ca-certificates && \
     rm -rf /var/lib/apt/lists/*
