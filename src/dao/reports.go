@@ -1,15 +1,24 @@
 package dao
 
 import (
+	"context"
+
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
+
 	"kuclap-review-api/src/models"
 )
 
 // InsertReport is Insert report to database
-func (m *SessionDAO) InsertReport(report models.Report) error {
-	db	:=	session.Copy()
-	defer db.Close()
+func (m *SessionDAO) InsertReport(ctx context.Context, report models.Report) error {
+	bb, err := bson.Marshal(report)
+	if err != nil {
+		return errors.Wrap(err, "[SessionDAO.CreateRecap]: unable to marshal report")
+	}
 
-	err	:=	db.DB(m.Database).C(COLLECTION_REPORTS).Insert(&report)
+	if _, err := m.reports.InsertOne(ctx, bb); err != nil {
+		return errors.Wrap(err, "[SessionDAO.CreateRecap]: unable to insert report")
+	}
 
-	return err	
+	return nil
 }
