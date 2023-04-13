@@ -138,6 +138,8 @@ func (m *SessionDAO) FindReviewsByClassID(ctx context.Context, classID string, p
 			return nil, errors.Wrap(err, "[SessionDAO.FindReviewsByClassID]: unable to decode content")
 		}
 
+		c.ToDefault()
+
 		rr = append(rr, c)
 	}
 
@@ -181,6 +183,8 @@ func (m *SessionDAO) LastReviews(ctx context.Context, page string, offset string
 			return nil, errors.Wrap(err, "[SessionDAO.LastReviews]: unable to decode content")
 		}
 
+		c.ToDefault()
+
 		rr = append(rr, c)
 	}
 
@@ -202,6 +206,8 @@ func (m *SessionDAO) FindAll(ctx context.Context) ([]models.ResReview, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "[SessionDAO.FindAll]: unable to decode content")
 		}
+
+		c.ToDefault()
 
 		rr = append(rr, c)
 	}
@@ -228,6 +234,8 @@ func (m *SessionDAO) FindByID(ctx context.Context, reviewID string) (*models.Res
 		return nil, errors.Wrap(err, "[SessionDAO.FindByID]: unable to decode content")
 	}
 
+	review.ToDefault()
+
 	return review, nil
 }
 
@@ -249,6 +257,8 @@ func (m *SessionDAO) FindReviewAllPropertyByID(ctx context.Context, reviewID str
 	if err := r.Decode(&review); err != nil {
 		return nil, errors.Wrap(err, "[SessionDAO.FindReviewAllPropertyByID]: unable to decode content")
 	}
+
+	review.ToDefault()
 
 	return review, nil
 }
