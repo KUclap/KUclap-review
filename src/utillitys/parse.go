@@ -3,15 +3,14 @@ package utillitys
 import (
 	"encoding/json"
 	"fmt"
-	"time"
-	"strings"
 	"io/ioutil"
+	"strings"
+	"time"
 
 	"github.com/KUclap/KUclap-review/src/models"
 )
 
-
-func main(){
+func main() {
 	var classesOld []models.OldClass
 	// var classesNew models.Classes
 	var result []models.Class
@@ -19,15 +18,15 @@ func main(){
 	// This I/O for reading from old data (KUnit version)
 	data, err := ioutil.ReadFile("../classes.json")
 	if err != nil {
-      fmt.Print("error (read file)",err)
+		fmt.Print("error (read file)", err)
 	}
 	if err := json.Unmarshal(data, &classesOld); err != nil {
-        fmt.Println("error (old-classes unmarshal):", err)
+		fmt.Println("error (old-classes unmarshal):", err)
 	}
 
 	// Make slice of Classes (KUclap version)
 	for _, class := range classesOld {
-		newStat := models.StatClass{0,0,0, time.Now().UTC() }
+		newStat := models.StatClass{0, 0, 0, time.Now().UTC()}
 
 		new := models.Class{
 			class.Value,
@@ -42,5 +41,5 @@ func main(){
 	}
 	file, _ := json.MarshalIndent(result, "", "	")
 	_ = ioutil.WriteFile("../classesParsed.json", file, 0644)
-	
+
 }

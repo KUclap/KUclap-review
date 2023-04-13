@@ -1,21 +1,19 @@
-package routes 
+package routes
 
 import (
-
+	"context"
 	"encoding/json"
-	"strings"
-	"net/http"
 	"log"
+	"net/http"
+	"strings"
 	"time"
-	// "fmt"
+
+	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"kuclap-review-api/src/helper"
 	"kuclap-review-api/src/models"
 	"kuclap-review-api/src/storage"
-
-	"gopkg.in/mgo.v2/bson"
-	"github.com/gorilla/mux"
-
 )
 
 func IndexRecapHandler(r *mux.Router) {
@@ -23,34 +21,35 @@ func IndexRecapHandler(r *mux.Router) {
 	var prefixPath = "/recap"
 
 	// Storage Adpater
-	r.HandleFunc(prefixPath + "/presigned/download/{recapid}", PresignedDownloadRecapEndPoint).Methods("GET")
-	r.HandleFunc(prefixPath + "/presigned/upload/{classid}", PresignedUploadRecapEndPoint).Methods("GET")
-	r.HandleFunc(prefixPath + "/upload", CreateRecapEndPoint).Methods("POST")
+	r.HandleFunc(prefixPath+"/presigned/download/{recapid}", PresignedDownloadRecapEndPoint).Methods("GET")
+	r.HandleFunc(prefixPath+"/presigned/upload/{classid}", PresignedUploadRecapEndPoint).Methods("GET")
+	r.HandleFunc(prefixPath+"/upload", CreateRecapEndPoint).Methods("POST")
 
 	// CRUD on Database
 	r.HandleFunc("/recaps/last", LastRecapsEndPoint).Methods("GET")
 	r.HandleFunc("/recaps/{classid}", AllRecapsByClassIDEndPoint).Methods("GET")
-	r.HandleFunc(prefixPath + "/{recapid}", FindRecapEndpoint).Methods("GET")
-	r.HandleFunc(prefixPath + "/{recapid}", DeleteRecapByIDEndPoint).Methods("DELETE")
+	r.HandleFunc(prefixPath+"/{recapid}", FindRecapEndpoint).Methods("GET")
+	r.HandleFunc(prefixPath+"/{recapid}", DeleteRecapByIDEndPoint).Methods("DELETE")
 	r.HandleFunc("/recaps", AllRecapsEndPoint).Methods("GET")
-	r.HandleFunc(prefixPath + "/report", CreateRecapReportEndPoint).Methods("POST")
-	
+	r.HandleFunc(prefixPath+"/report", CreateRecapReportEndPoint).Methods("POST")
+
 }
 
 func PresignedDownloadRecapEndPoint(w http.ResponseWriter, r *http.Request) {
-	
-	params			:=	mux.Vars(r)
-	
-	recapID			:=	params["recapid"]
-	recap, err		:=	mgoDAO.FindRecapByID(recapID)
+	ctx := context.Background()
 
-	if err	!=	nil {
+	params := mux.Vars(r)
+
+	recapID := params["recapid"]
+	recap, err := repository.FindRecapByID(ctx, recapID)
+
+	if err != nil {
 		log.Println("[ERR] mgo find recap: ", err)
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid recap-id or haven't your id in DB")
 		return
 	}
 
-	url, err	:=	storage.PresignedURLDownloadRecapS3(&recap)
+	url, err := storage.PresignedURLDownloadRecapS3(recap)
 
 	if err != nil {
 		log.Println("[ERR] presigned error: ", err)
@@ -58,7 +57,8 @@ func PresignedDownloadRecapEndPoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err	:=	mgoDAO.UpdateNumberDonwloadedByRecapID(recapID); err != nil {
+	updateAt := time.Now().UTC().Add(7 * time.Hour)
+	if err := repository.UpdateNumberDownloadedByRecapID(ctx, recapID, updateAt); err != nil {
 		log.Println("[ERR] mgo update: ", err)
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -68,13 +68,14 @@ func PresignedDownloadRecapEndPoint(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func PresignedUploadRecapEndPoint(w http.ResponseWriter, r *http.Request){
+func PresignedUploadRecapEndPoint(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 
-	params		:=	mux.Vars(r)
-	author			:=	r.URL.Query().Get("author")
+	params := mux.Vars(r)
+	author := r.URL.Query().Get("author")
 
-	recapID			:=	bson.NewObjectId().Hex()
-	classID			:=	params["classid"]
+	recapID := primitive.NewObjectID().Hex()
+	classID := params["classid"]
 
 	if classID == "" {
 		log.Println("[ERR] no classId from param")
@@ -82,14 +83,14 @@ func PresignedUploadRecapEndPoint(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	class, err	:=	mgoDAO.FindClassByClassID(classID)
-	if err	!=	nil {
+	class, err := repository.FindClassByClassID(ctx, classID)
+	if err != nil {
 		log.Println("[ERR] mgo find class: ", err)
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	payload, err	:=	storage.PresignedURLUploadRecapS3(&class, author, recapID)
+	payload, err := storage.PresignedURLUploadRecapS3(class, author, recapID)
 
 	log.Println(payload, err)
 
@@ -103,26 +104,28 @@ func PresignedUploadRecapEndPoint(w http.ResponseWriter, r *http.Request){
 
 }
 
-func CreateRecapEndPoint(w http.ResponseWriter, r *http.Request){
+func CreateRecapEndPoint(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 
-	var newRecap	models.Recap
+	var newRecap models.Recap
 	defer r.Body.Close()
 
-	if err	:=	json.NewDecoder(r.Body).Decode(&newRecap); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&newRecap); err != nil {
 		log.Println("[ERR] decode err: ", err)
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
-	newRecap.CreatedAt	=	time.Now().UTC().Add(7 * time.Hour)
+	newRecap.CreatedAt = time.Now().UTC().Add(7 * time.Hour)
 
-	if err	:=	mgoDAO.CreateRecap(newRecap); err != nil {
+	if err := repository.CreateRecap(ctx, newRecap); err != nil {
 		log.Println("[ERR] mgo create recap: ", err)
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if err	:=	mgoDAO.UpdateNumberRecapByClassID(newRecap.ClassID, 1); err != nil {
+	updateAt := time.Now().UTC().Add(7 * time.Hour)
+	if err := repository.UpdateNumberRecapByClassID(ctx, newRecap.ClassID, 1, updateAt); err != nil {
 		log.Println("[ERR] mgo update recap: ", err)
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -132,14 +135,15 @@ func CreateRecapEndPoint(w http.ResponseWriter, r *http.Request){
 
 }
 
-func LastRecapsEndPoint(w http.ResponseWriter, r *http.Request){
-		
-	page			:=	r.URL.Query().Get("page")
-	offset			:=	r.URL.Query().Get("offset")
+func LastRecapsEndPoint(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 
-	recaps, err	:=	mgoDAO.LastRecaps(page ,offset)
+	page := r.URL.Query().Get("page")
+	offset := r.URL.Query().Get("offset")
 
-	if err	!=	nil {
+	recaps, err := repository.LastRecaps(ctx, page, offset)
+
+	if err != nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid recap offset")
 		return
 	}
@@ -148,30 +152,32 @@ func LastRecapsEndPoint(w http.ResponseWriter, r *http.Request){
 
 }
 
-func AllRecapsByClassIDEndPoint(w http.ResponseWriter, r *http.Request){
+func AllRecapsByClassIDEndPoint(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 
-	params			:=	mux.Vars(r)
+	params := mux.Vars(r)
 
-	page			:=	r.URL.Query().Get("page")
-	offset			:=	r.URL.Query().Get("offset")
+	page := r.URL.Query().Get("page")
+	offset := r.URL.Query().Get("offset")
 
-	recaps, err	:=	mgoDAO.FindRecapsByClassID(params["classid"], page, offset)
+	recaps, err := repository.FindRecapsByClassID(ctx, params["classid"], page, offset)
 
-	if err	!=	nil {
+	if err != nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid recap classid")
 		return
 	}
 
 	helper.RespondWithJson(w, http.StatusOK, recaps)
-	
+
 }
 
-func FindRecapEndpoint(w http.ResponseWriter, r *http.Request){
+func FindRecapEndpoint(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 
-	params			:= mux.Vars(r)
-	recap, err	:= mgoDAO.FindRecapByID(params["recapid"])
+	params := mux.Vars(r)
+	recap, err := repository.FindRecapByID(ctx, params["recapid"])
 
-	if err	!=	nil {
+	if err != nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid recap-id or haven't your id in DB")
 		return
 	}
@@ -180,67 +186,69 @@ func FindRecapEndpoint(w http.ResponseWriter, r *http.Request){
 
 }
 
-func DeleteRecapByIDEndPoint(w http.ResponseWriter, r *http.Request){
+func DeleteRecapByIDEndPoint(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 
-	params			:=	mux.Vars(r) 
-	
-	reqToken		:=	r.Header.Get("Authorization")
-	splitToken		:=	strings.Split(reqToken, " ")
-	reqAuth			:=	splitToken[1]
+	params := mux.Vars(r)
 
-	recap, err		:=	mgoDAO.FindRecapAllPropertyByID(params["recapid"])
+	reqToken := r.Header.Get("Authorization")
+	splitToken := strings.Split(reqToken, " ")
+	reqAuth := splitToken[1]
 
-	if err	!=	nil {
+	recap, err := repository.FindRecapAllPropertyByID(ctx, params["recapid"])
+
+	if err != nil {
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid recap-id or haven't your id in DB")
 		return
 	}
 
 	if recap.Auth == reqAuth {
-		
+
 		// Delete the recap
-		if err	:=	mgoDAO.DeleteRecapByID(params["recapid"]); err != nil {
+		if err := repository.DeleteRecapByID(ctx, params["recapid"]); err != nil {
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		if err	=	mgoDAO.UpdateNumberRecapByClassID(recap.ClassID, -1); err != nil {
+		updateAt := time.Now().UTC().Add(7 * time.Hour)
+		if err = repository.UpdateNumberRecapByClassID(ctx, recap.ClassID, -1, updateAt); err != nil {
 			helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 		if recap.ReviewID != "" {
 			// Delete review that storing the recap.
-			review, err	:=	mgoDAO.FindReviewAllPropertyByID(recap.ReviewID)
-			if err	!=	nil {
+			review, err := repository.FindReviewAllPropertyByID(ctx, recap.ReviewID)
+			if err != nil {
 				helper.RespondWithError(w, http.StatusBadRequest, "Invalid review-id or haven't your id in DB")
 				return
 			}
-			
-			class, err	:=	mgoDAO.FindClassByClassID(recap.ClassID)
-			if err	!=	nil {
+
+			class, err := repository.FindClassByClassID(ctx, recap.ClassID)
+			if err != nil {
 				helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
-			var newStats	models.StatClass
-			var oldStats =	class.Stats
+			var newStats models.StatClass
+			var oldStats = class.Stats
 
-			if class.NumberReviewer ==  1 {
+			if class.NumberReviewer == 1 {
 				// Ignore NaN when we divide with zero
-				newStats.How		=	0
-				newStats.Homework	=	0
-				newStats.Interest	=	0
+				newStats.How = 0
+				newStats.Homework = 0
+				newStats.Interest = 0
 			} else {
-				newStats.How		=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
-				newStats.Homework	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Homework,  review.Stats.Homework)
-				newStats.Interest	=	helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Interest,  review.Stats.Interest)
+				newStats.How = helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.How, review.Stats.How)
+				newStats.Homework = helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Homework, review.Stats.Homework)
+				newStats.Interest = helper.GetNewStatsByDeleted(class.NumberReviewer, oldStats.Interest, review.Stats.Interest)
 			}
-			
-			if err	:=	mgoDAO.DeleteByID(recap.ReviewID); err != nil {
+
+			if err := repository.DeleteByID(ctx, recap.ReviewID); err != nil {
 				helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
 
-			if err	=	mgoDAO.UpdateStatsClassByDeleted(recap.ClassID, newStats); err != nil {
+			if err = repository.UpdateStatsClassByDeleted(ctx, recap.ClassID, newStats); err != nil {
 				helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 				return
 			}
@@ -254,11 +262,12 @@ func DeleteRecapByIDEndPoint(w http.ResponseWriter, r *http.Request){
 
 }
 
-func AllRecapsEndPoint(w http.ResponseWriter, r *http.Request){
+func AllRecapsEndPoint(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 
-	recaps, err	:=	mgoDAO.FindAllRecaps()
+	recaps, err := repository.FindAllRecaps(ctx)
 
-	if err	!=	nil {
+	if err != nil {
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -267,31 +276,33 @@ func AllRecapsEndPoint(w http.ResponseWriter, r *http.Request){
 
 }
 
-func CreateRecapReportEndPoint(w http.ResponseWriter, r *http.Request) { 
-	
+func CreateRecapReportEndPoint(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
 	var report models.Report
 	defer r.Body.Close()
-	
-	if err	:=	json.NewDecoder(r.Body).Decode(&report); err != nil {
+
+	if err := json.NewDecoder(r.Body).Decode(&report); err != nil {
 		log.Println("Error in decoding body on request", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
-	if err	:=	mgoDAO.UpdateRecapReportByID(report.RecapID); err != nil {
+	updateAt := time.Now().UTC().Add(7 * time.Hour)
+	if err := repository.UpdateRecapReportByID(ctx, report.RecapID, updateAt); err != nil {
 		log.Println("Error in UpdateReportByID DAO", err.Error())
 		helper.RespondWithError(w, http.StatusBadRequest, "Invalid review id")
 		return
 	}
 
-	report.CreatedAt	=	time.Now().UTC().Add(7 * time.Hour)
+	report.CreatedAt = time.Now().UTC().Add(7 * time.Hour)
 
-	if err	:=	mgoDAO.InsertReport(report); err != nil {
+	if err := repository.InsertReport(ctx, report); err != nil {
 		log.Println("Error in InsertReport DAO", err.Error())
 		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	helper.RespondWithJson(w, http.StatusCreated, report)
-	
+
 }
