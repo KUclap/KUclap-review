@@ -1,51 +1,61 @@
 package dao
 
 import (
+	"context"
 	"log"
-	"crypto/tls"
-	"net"
+	"time"
 
-	"gopkg.in/mgo.v2"
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
-	COLLECTION_REVIEWS	=	"reviews"
-	COLLECTION_CLASSES	=	"classes"
-	COLLECTION_REPORTS	=	"reported"
-	COLLECTION_QUESTION	=	"questions"
-	COLLECTION_ANSWERS	=	"answers"
-	COLLECTION_RECAPS	=	"recaps"
+	COLLECTION_REVIEWS   = "reviews"
+	COLLECTION_CLASSES   = "classes"
+	COLLECTION_REPORTS   = "reported"
+	COLLECTION_QUESTIONS = "questions"
+	COLLECTION_ANSWERS   = "answers"
+	COLLECTION_RECAPS    = "recaps"
 )
 
 // SessionDAO is struct for allocate info for create connection with mongoDB
 type SessionDAO struct {
 	Server   string
 	Database string
-}
 
-var session *mgo.Session
+	reviews   *mongo.Collection
+	classes   *mongo.Collection
+	reports   *mongo.Collection
+	questions *mongo.Collection
+	answers   *mongo.Collection
+	recaps    *mongo.Collection
+}
 
 // Connect is Establish a connection to database
 func (m *SessionDAO) Connect() {
 
-	tlsConfig		:=	&tls.Config{}
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
 
-	dialInfo, err	:=	mgo.ParseURL(m.Server)
+	client, err := mongo.NewClient(options.Client().ApplyURI(m.Server))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "[SessionDAO.Connect]: unable to create client mongodb"))
 	}
 
-	dialInfo.DialServer	=	func(addr *mgo.ServerAddr) (net.Conn, error) {
-		conn, err	:=	tls.Dial("tcp", addr.String(), tlsConfig)
-		return conn, err
-	}
-
-	session, err	=	mgo.DialWithInfo(dialInfo)
+	err = client.Connect(ctx)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(errors.Wrap(err, "[SessionDAO.Connect]: unable to connect to mongodb database"))
 	}
 
-	session.SetMode(mgo.Monotonic, true)
+	db := client.Database(m.Database)
 
-	log.Println("MGO: Mongo has connected, Server get origin session. 🎉")
+	m.reviews = db.Collection(COLLECTION_REVIEWS)
+	m.classes = db.Collection(COLLECTION_CLASSES)
+	m.reports = db.Collection(COLLECTION_REPORTS)
+	m.questions = db.Collection(COLLECTION_QUESTIONS)
+	m.answers = db.Collection(COLLECTION_ANSWERS)
+	m.recaps = db.Collection(COLLECTION_RECAPS)
+
+	log.Println("mongodb: Mongo has connected, Server get origin session. 🎉")
 }
