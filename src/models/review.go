@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -105,7 +104,18 @@ type RDeleteReview struct {
 }
 
 // ToDefault setting default value for review
-func (review *ResReview) ToDefault(raw bson.Raw) {
+func (review *ResReview) ToDefault() {
+	review.Stats.How = review.Stats.How * 20
+	review.Stats.Homework = review.Stats.Homework * 20
+	review.Stats.Interest = review.Stats.Interest * 20
+
+	if review.DeleteReason != "" {
+		review.Text = ""
+	}
+}
+
+// ToDefault setting default value for review
+func (review *Review) ToDefault() {
 	review.Stats.How = review.Stats.How * 20
 	review.Stats.Homework = review.Stats.Homework * 20
 	review.Stats.Interest = review.Stats.Interest * 20
