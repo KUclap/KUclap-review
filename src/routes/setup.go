@@ -1,11 +1,11 @@
 package routes
 
-import ( 
+import (
 	"kuclap-review-api/src/dao"
 )
 
-var mgoDAO *dao.SessionDAO
+var repository *dao.SessionDAO
 
 func InjectAdapterDAO(sessionDAO *dao.SessionDAO) {
-	mgoDAO = sessionDAO
+	repository = sessionDAO
 }
