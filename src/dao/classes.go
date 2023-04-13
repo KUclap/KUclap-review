@@ -1,72 +1,149 @@
 package dao
 
 import (
+	"context"
 	"time"
-	
+
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
+
 	"kuclap-review-api/src/models"
-	"gopkg.in/mgo.v2/bson"
 )
 
-// UpdateStatsClassByCreated is Update stats on class by class_id 
-func (m *SessionDAO) UpdateStatsClassByCreated(classID string, newStats models.StatClass) error {
-	db	:=	session.Copy()
-	defer db.Close()
-	
-	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": 1}})
+// UpdateStatsClassByCreated is Update stats on class by class_id
+func (m *SessionDAO) UpdateStatsClassByCreated(ctx context.Context, classID string, newStats models.StatClass) error {
+	filter := bson.M{"class_id": classID}
+	operation := bson.M{
+		"$set": bson.M{"stats": newStats},
+		"$inc": bson.M{"number_reviewer": 1},
+	}
 
-	return err
+	r := m.classes.FindOneAndUpdate(ctx, filter, operation)
+	if err := r.Err(); err != nil {
+		return errors.Wrap(err, "[SessionDAO.UpdateStatsClassByCreated]: unable to find class and increase stats")
+	}
+
+	return nil
 }
 
-// UpdateStatsClassByDeleted is Update stats on class by class_id 
-func (m *SessionDAO) UpdateStatsClassByDeleted(classID string, newStats models.StatClass) error {
-	db	:=	session.Copy()
-	defer db.Close()
+// UpdateStatsClassByDeleted is Update stats on class by class_id
+func (m *SessionDAO) UpdateStatsClassByDeleted(ctx context.Context, classID string, newStats models.StatClass) error {
+	filter := bson.M{"class_id": classID}
+	operation := bson.M{
+		"$set": bson.M{"stats": newStats},
+		"$inc": bson.M{"number_reviewer": -1},
+	}
 
-	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$set": bson.M{"stats": newStats}, "$inc": bson.M{"number_reviewer": -1}})
+	r := m.classes.FindOneAndUpdate(ctx, filter, operation)
+	if err := r.Err(); err != nil {
+		return errors.Wrap(err, "[SessionDAO.UpdateStatsClassByDeleted]: unable to find class and decrease stats")
+	}
 
-	return err
+	return nil
 }
 
-// UpdateNuberReviewByClassID is Update number of review
-func (m *SessionDAO) UpdateNuberReviewByClassID(classID string, updateAt time.Time) error {
-	db	:=	session.Copy()
-	defer db.Close()
+// UpdateNumberReviewByClassID is Update number of review
+func (m *SessionDAO) UpdateNumberReviewByClassID(ctx context.Context, classID string, updateAt time.Time) error {
+	filter := bson.M{"class_id": classID}
+	operation := bson.M{
+		"$set": bson.M{"update_at": updateAt},
+		"$inc": bson.M{"number_reviewer": 1},
+	}
 
-	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Update(bson.M{"class_id": classID}, bson.M{"$inc": bson.M{"number_reviewer": 1}})
-	
-	return err
+	r := m.classes.FindOneAndUpdate(ctx, filter, operation)
+	if err := r.Err(); err != nil {
+		return errors.Wrap(err, "[SessionDAO.UpdateNumberReviewByClassID]: unable to find class and increase stats")
+	}
+
+	return nil
+}
+
+// UpdateNumberRecapByClassID is Update number of review
+func (m *SessionDAO) UpdateNumberRecapByClassID(ctx context.Context, classID string, number int, updateAt time.Time) error {
+	filter := bson.M{"class_id": classID}
+	operation := bson.M{
+		"$set": bson.M{"update_at": updateAt},
+		"$inc": bson.M{"number_recaps": int32(number)},
+	}
+
+	r := m.classes.FindOneAndUpdate(ctx, filter, operation)
+	if err := r.Err(); err != nil {
+		return errors.Wrap(err, "[SessionDAO.UpdateNumberRecapByClassID]: unable to find class and increase number of recaps stats")
+	}
+
+	return nil
+}
+
+// UpdateNumberQuestionByClassID is Update number of review
+func (m *SessionDAO) UpdateNumberQuestionByClassID(ctx context.Context, classID string, number int, updateAt time.Time) error {
+	filter := bson.M{"class_id": classID}
+	operation := bson.M{
+		"$set": bson.M{"update_at": updateAt},
+		"$inc": bson.M{"number_questions": int32(number)},
+	}
+
+	r := m.classes.FindOneAndUpdate(ctx, filter, operation)
+	if err := r.Err(); err != nil {
+		return errors.Wrap(err, "[SessionDAO.UpdateNumberQuestionByClassID]: unable to find class and increase number of questions stats")
+	}
+
+	return nil
+
 }
 
 // FindClassByClassID is Find class by class_id
-func (m *SessionDAO) FindClassByClassID(classID string) (models.Class, error) {
-	var class models.Class
+func (m *SessionDAO) FindClassByClassID(ctx context.Context, classID string) (*models.Class, error) {
+	filter := bson.M{"class_id": classID}
 
-	db	:=	session.Copy()
-	defer db.Close()
+	r := m.classes.FindOne(ctx, filter)
+	if err := r.Err(); err != nil {
+		return nil, errors.Wrapf(err, "[SessionDAO.FindClassByClassID]: unable to find one, %s", classID)
+	}
 
-	err := db.DB(m.Database).C(COLLECTION_CLASSES).Find(bson.M{"class_id": classID}).One(&class)
+	var class *models.Class
+	if err := r.Decode(&class); err != nil {
+		return nil, errors.Wrap(err, "[SessionDAO.FindClassByClassID]: unable to decode content")
+	}
 
-	return class, err
+	class.ToDefault()
+
+	return class, nil
 }
 
-// FindAllClasses is Find All of list of classes 
-func (m *SessionDAO) FindAllClasses() ([]models.Class, error) {
-	var classes []models.Class
+// FindAllClasses is Find All of list of classes
+func (m *SessionDAO) FindAllClasses(ctx context.Context) ([]models.Class, error) {
+	cur, err := m.classes.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, errors.Wrap(err, "[SessionDAO.FindAllClasses]: unable to find all")
+	}
 
-	db	:=	session.Copy()
-	defer db.Close()
-	
-	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Find(bson.M{}).All(&classes)
-	
-	return classes, err
+	var cc []models.Class
+	for cur.Next(ctx) {
+		var c models.Class
+
+		err := cur.Decode(&c)
+		if err != nil {
+			return nil, errors.Wrap(err, "[SessionDAO.FindAllClasses]: unable to decode content")
+		}
+
+		c.ToDefault()
+
+		cc = append(cc, c)
+	}
+
+	return cc, err
 }
 
 // InsertClass is Insert class to database
-func (m *SessionDAO) InsertClass(class models.Class) error {
-	db	:=	session.Copy()
-	defer db.Close()
+func (m *SessionDAO) InsertClass(ctx context.Context, class models.Class) error {
+	bb, err := bson.Marshal(class)
+	if err != nil {
+		return errors.Wrap(err, "[SessionDAO.InsertClass]: unable to marshal answer")
+	}
 
-	err	:=	db.DB(m.Database).C(COLLECTION_CLASSES).Insert(&class)
+	if _, err := m.classes.InsertOne(ctx, bb); err != nil {
+		return errors.Wrap(err, "[SessionDAO.InsertClass]: unable to insert class")
+	}
 
-	return err	
+	return nil
 }
