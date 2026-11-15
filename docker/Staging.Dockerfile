@@ -1,4 +1,4 @@
-FROM golang:1.18-buster as builder
+FROM golang:1.27-bookworm as builder
 WORKDIR /go/src/github.com/KUclap/KUclap-review
 
 ARG GIT_ACCESS_TOKEN_CURL_CONFIG_KUCLAP_API_REVIEW
@@ -15,7 +15,7 @@ RUN mv config.toml ./config/config.toml
 
 RUN go build -mod=readonly -v -o ./kuclap-review-api
 
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 WORKDIR /go/src/github.com/KUclap/KUclap-review
 
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \

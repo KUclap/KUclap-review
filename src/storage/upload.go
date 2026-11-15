@@ -46,7 +46,7 @@ func PresignedURLUploadRecapS3(class *models.Class, author string, recapID strin
 		Bucket:        aws.String(BUCKET_NAME),
 		Key:           aws.String(key),
 		Tagging:       aws.String(tag),
-		ContentLength: LIMIT_FILE_SIZE,
+		ContentLength: aws.Int64(LIMIT_FILE_SIZE),
 	}
 
 	pressignedClient := s3.NewPresignClient(client)
